@@ -1,0 +1,7 @@
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 24090 MiB):
+  Device 0: NVIDIA GeForce RTX 4090, compute capability 8.9, VMM: yes, VRAM: 24090 MiB
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 24090 MiB):
+  Device 0: NVIDIA GeForce RTX 4090, compute capability 8.9, VMM: yes, VRAM: 24090 MiB
+ggml_cuda_init: found 1 CUDA devices (Total VRAM: 24090 MiB):
+  Device 0: NVIDIA GeForce RTX 4090, compute capability 8.9, VMM: yes, VRAM: 24090 MiB
+BENCH_EXIT=0

@@ -1,0 +1,43 @@
+{
+ "meta": {
+  "engine": "ollama",
+  "tag": "gptoss-h2",
+  "model": "gpt-oss:20b",
+  "scenario": "decode",
+  "base_url": "http://127.0.0.1:11434",
+  "api": "ollama",
+  "think": false,
+  "client_host": "d6c81a8fafb5",
+  "started": "20260924-183557",
+  "argv": [
+   "--base-url",
+   "http://127.0.0.1:11434",
+   "--api",
+   "ollama",
+   "--api-key",
+   "***",
+   "--model",
+   "gpt-oss:20b",
+   "--engine",
+   "ollama",
+   "--tag",
+   "gptoss-h2",
+   "--out",
+   "/workspace/results/raw",
+   "decode",
+   "--concurrency",
+   "1",
+   "2",
+   "4",
+   "8",
+   "16",
+   "--input-len",
+   "1024",
+   "--output-len",
+   "256",
+   "--rounds",
+   "3"
+  ]
+ },
+ "cells": []
+}

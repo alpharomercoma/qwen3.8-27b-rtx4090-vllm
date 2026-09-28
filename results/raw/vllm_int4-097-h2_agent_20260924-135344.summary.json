@@ -1,0 +1,42 @@
+{
+ "meta": {
+  "engine": "vllm",
+  "tag": "int4-097-h2",
+  "model": "qwen3.8-27b",
+  "scenario": "agent",
+  "base_url": "http://127.0.0.1:8000/v1",
+  "api": "openai",
+  "think": false,
+  "client_host": "d6c81a8fafb5",
+  "started": "20260924-135344",
+  "argv": [
+   "--base-url",
+   "http://127.0.0.1:8000/v1",
+   "--api",
+   "openai",
+   "--api-key",
+   "***",
+   "--model",
+   "qwen3.8-27b",
+   "--engine",
+   "vllm",
+   "--tag",
+   "int4-097-h2",
+   "--out",
+   "/workspace/results/raw",
+   "agent",
+   "--users",
+   "12",
+   "16",
+   "--turns",
+   "8",
+   "--tool-tokens",
+   "1500",
+   "--output-len",
+   "150",
+   "--prefix-request",
+   "/workspace/4090/bench/pi_opening_request.json"
+  ]
+ },
+ "cells": []
+}

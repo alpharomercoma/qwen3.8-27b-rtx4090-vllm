@@ -1,0 +1,46 @@
+# POD. The only door to the model server. Listens on 127.0.0.1:8443; the reverse SSH tunnel (edge_tunnel.sh)
+# carries https://alphaexperiments.com/heretic-inference/v1/* here from the edge server.
+{
+	admin off
+	auto_https off
+	servers {
+		# the edge server's Caddy sets X-Forwarded-For; log the real client address
+		trusted_proxies static 127.0.0.1/32
+	}
+}
+
+# plain HTTP on loopback: TLS ends at the edge server, and the SSH tunnel encrypts the hop to here
+# Any Host header (requests arrive as alphaexperiments.com), but only on loopback.
+http://:{$GATEWAY_PORT:8443} {
+	bind 127.0.0.1
+	log {
+		output file /workspace/logs/gateway_access.log {
+			roll_size 50MiB
+			roll_keep 5
+		}
+		format json
+	}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	# The model API. authz.py decides who may call it (team API keys, the web app's Vercel OIDC token). vLLM only
+	# ever sees the gateway's own key, and only /v1/* is reachable: /metrics, /tokenize, /invocations ... stay private.
+	handle /v1/* {
+		forward_auth 127.0.0.1:{$AUTHZ_PORT:8444} {
+			uri /auth
+			copy_headers X-Heretic-Client
+		}
+		# who called: key-<label> or vercel-<environment>
+		log_append caller {http.request.header.X-Heretic-Client}
+		reverse_proxy 127.0.0.1:{$UPSTREAM_PORT:8000} {
+			flush_interval -1
+			header_up Authorization "Bearer {$UPSTREAM_API_KEY}"
+		}
+	}
+
+	handle {
+		respond "not found" 404
+	}
+}

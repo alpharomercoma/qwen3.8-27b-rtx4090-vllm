@@ -1,0 +1,43 @@
+{
+ "meta": {
+  "engine": "sglang",
+  "tag": "gptoss-h2",
+  "model": "gpt-oss-20b",
+  "scenario": "decode",
+  "base_url": "http://127.0.0.1:8000/v1",
+  "api": "openai",
+  "think": false,
+  "client_host": "d6c81a8fafb5",
+  "started": "20260924-183444",
+  "argv": [
+   "--base-url",
+   "http://127.0.0.1:8000/v1",
+   "--api",
+   "openai",
+   "--api-key",
+   "***",
+   "--model",
+   "gpt-oss-20b",
+   "--engine",
+   "sglang",
+   "--tag",
+   "gptoss-h2",
+   "--out",
+   "/workspace/results/raw",
+   "decode",
+   "--concurrency",
+   "1",
+   "2",
+   "4",
+   "8",
+   "16",
+   "--input-len",
+   "1024",
+   "--output-len",
+   "256",
+   "--rounds",
+   "3"
+  ]
+ },
+ "cells": []
+}

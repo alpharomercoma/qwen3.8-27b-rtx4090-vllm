@@ -1,0 +1,64 @@
+## vLLM: pool sizes and memory profiling (file: line)
+/workspace/logs/serve_vllm-int4-097.log:INFO 09-24 13:49:55 [model_runner.py:428] Model loading took 16.59 GiB memory and 74.050955 seconds
+/workspace/logs/serve_vllm-int4-097.log:INFO 09-24 13:49:55 [interface.py:933] Setting attention block size to 800 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4-097.log:INFO 09-24 13:50:35 [gpu_worker.py:640] Available KV cache memory: 5.41 GiB
+/workspace/logs/serve_vllm-int4-097.log:INFO 09-24 13:50:35 [kv_cache_utils.py:2395] GPU KV cache size: 164,584 tokens, Maximum concurrency for 65,536 tokens per request: 2.51x
+/workspace/logs/serve_vllm-int4-097.log:INFO 09-24 13:50:47 [gpu_worker.py:888] Free memory on device (23.13/23.52 GiB) on startup. Desired GPU memory utilization is (0.97, 22.81 GiB). Actual usage is 16.86 GiB for consumed memory (weights + non-torch), 0.54 GiB for peak activation, and 0.09 GiB for CUDAGraph memory. Replace gpu
+/workspace/logs/serve_vllm-int4-kv4-mtp.log:INFO 09-23 09:10:02 [model_runner.py:428] Model loading took 17.38 GiB memory and 78.399055 seconds
+/workspace/logs/serve_vllm-int4-kv4-mtp.log:INFO 09-23 09:10:02 [interface.py:933] Setting attention block size to 1600 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4-kv4-mtp.log:INFO 09-23 09:11:56 [gpu_worker.py:640] Available KV cache memory: 2.36 GiB
+/workspace/logs/serve_vllm-int4-kv4-mtp.log:INFO 09-23 09:11:56 [kv_cache_utils.py:2395] GPU KV cache size: 108,814 tokens, Maximum concurrency for 65,536 tokens per request: 1.66x
+/workspace/logs/serve_vllm-int4-kv4-mtp.log:INFO 09-23 09:12:26 [gpu_worker.py:888] Free memory on device (23.14/23.53 GiB) on startup. Desired GPU memory utilization is (0.97, 22.82 GiB). Actual usage is 17.62 GiB for consumed memory (weights + non-torch), 2.84 GiB for peak activation, and 0.18 GiB for CUDAGraph memory. Replace
+/workspace/logs/serve_vllm-int4-kv4-pin.log:INFO 09-24 14:02:07 [model_runner.py:428] Model loading took 16.59 GiB memory and 76.564666 seconds
+/workspace/logs/serve_vllm-int4-kv4-pin.log:INFO 09-24 14:02:07 [interface.py:933] Setting attention block size to 1552 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4-kv4-pin.log:INFO 09-24 14:02:39 [kv_cache_utils.py:2395] GPU KV cache size: 246,094 tokens, Maximum concurrency for 65,536 tokens per request: 3.76x
+/workspace/logs/serve_vllm-int4-kv4.log:INFO 09-24 13:02:15 [model_runner.py:428] Model loading took 16.59 GiB memory and 73.182032 seconds
+/workspace/logs/serve_vllm-int4-kv4.log:INFO 09-24 13:02:15 [interface.py:933] Setting attention block size to 1552 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4-kv4.log:INFO 09-24 13:02:51 [gpu_worker.py:640] Available KV cache memory: 5.45 GiB
+/workspace/logs/serve_vllm-int4-kv4.log:INFO 09-24 13:02:51 [kv_cache_utils.py:2395] GPU KV cache size: 298,255 tokens, Maximum concurrency for 65,536 tokens per request: 4.55x
+/workspace/logs/serve_vllm-int4-kv4.log:INFO 09-24 13:03:03 [gpu_worker.py:888] Free memory on device (23.13/23.52 GiB) on startup. Desired GPU memory utilization is (0.97, 22.81 GiB). Actual usage is 16.86 GiB for consumed memory (weights + non-torch), 0.5 GiB for peak activation, and 0.08 GiB for CUDAGraph memory. Replace gpu_
+/workspace/logs/serve_vllm-int4-mtp.log:INFO 09-23 07:44:05 [model_runner.py:428] Model loading took 17.38 GiB memory and 81.454193 seconds
+/workspace/logs/serve_vllm-int4-mtp.log:INFO 09-23 07:44:06 [interface.py:933] Setting attention block size to 832 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4-mtp.log:INFO 09-23 07:46:05 [gpu_worker.py:640] Available KV cache memory: 1.93 GiB
+/workspace/logs/serve_vllm-int4.log:INFO 09-23 07:18:27 [model_runner.py:428] Model loading took 16.59 GiB memory and 78.220270 seconds
+/workspace/logs/serve_vllm-int4.log:INFO 09-23 07:18:28 [interface.py:933] Setting attention block size to 800 tokens to ensure that attention page size is >= mamba page size.
+/workspace/logs/serve_vllm-int4.log:INFO 09-23 07:22:01 [gpu_worker.py:640] Available KV cache memory: 2.78 GiB
+/workspace/logs/serve_vllm-int4.log:INFO 09-23 07:22:01 [kv_cache_utils.py:2395] GPU KV cache size: 84,898 tokens, Maximum concurrency for 65,536 tokens per request: 1.30x
+/workspace/logs/serve_vllm-int4.log:INFO 09-23 07:23:27 [gpu_worker.py:888] Free memory on device (23.14/23.53 GiB) on startup. Desired GPU memory utilization is (0.95, 22.35 GiB). Actual usage is 16.86 GiB for consumed memory (weights + non-torch), 2.71 GiB for peak activation, and 0.09 GiB for CUDAGraph memory. Replace gpu_mem
+
+## vLLM fp8 at 0.97 (host 2): runtime crash
+(EngineCore pid=6931) ERROR 09-24 13:53:38 [core.py:1368] torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 58.00 MiB. GPU 0 has a total capacity of 23.52 GiB of which 55.75 MiB is free. Including non-PyTorch memory, this process has 23.45 GiB memory in use. Of the allocated memory 22.70 GiB is allocated by PyTorch, 
+
+## vLLM MTP at fp8 KV, 65k: boot failure
+(EngineCore pid=33788) ERROR 09-23 07:46:05 [core.py:1366] ValueError: To serve at least one request with the model's max seq len (65536), (2.45 GiB KV cache is needed, which is larger than the available KV cache memory (1.91 GiB). Based on the available memory, the estimated maximum model length is 48256. Try increasing `gpu_me
+
+## SGLang: pools and caps
+/workspace/logs/serve_sglang-int4-um.log:[2026-09-24 13:42:05] max_running_requests is capped to 2 by the mamba state cache (max_mamba_cache_size=10, 5 state slots per request). To raise it: increase --mamba-full-memory-ratio or --max-mamba-cache-size, or halve the state size with --mamba-ssm-dtype bfloat16.
+/workspace/logs/serve_sglang-int4-um.log:[2026-09-24 13:42:05] [unified-memory-pool] UnifiedKVPool allocated: total_bytes=2.46 GB (=2642292736 B), 2 sub-pool(s)
+/workspace/logs/serve_sglang-int4-um.log:[2026-09-24 13:42:05] KV Cache is allocated. dtype: torch.bfloat16, #tokens: 1290175, K size: 0.00 GB, V size: 0.00 GB
+/workspace/logs/serve_sglang-int4-um.log:[2026-09-24 13:42:05] [unified-memory-pool]   total_bytes=2642292736, max_total_num_tokens=28348, max_mamba_cache_size=10, max_num_reqs=2, speculative_num_draft_tokens=None
+/workspace/logs/serve_sglang-int4-um.log:[2026-09-24 13:42:13] max_total_num_tokens=28348, chunked_prefill_size=2048, max_prefill_tokens=16384, max_running_requests=2, context_len=65536, available_gpu_mem=2.84 GB
+/workspace/logs/serve_sglang-int4-um16.log:ValueError: Loaded weights leave no GPU memory for the KV cache under --mem-fraction-static=0.9. Raise --mem-fraction-static above 0.766 (minimum viable = 1 - available/pre = 0.7659). If using speculative decoding, draft weights are now counted.
+/workspace/logs/serve_sglang-int4.log:[2026-09-24 13:22:34] Mamba Cache is allocated. max_mamba_cache_size: 12, conv_state size: 0.04GB, ssm_state size: 0.91GB 
+/workspace/logs/serve_sglang-int4.log:[2026-09-24 13:22:34] KV Cache is allocated. dtype: torch.float8_e4m3fn, #tokens: 51908, K size: 0.79 GB, V size: 0.79 GB
+/workspace/logs/serve_sglang-int4.log:[2026-09-24 13:25:22] max_total_num_tokens=51908, chunked_prefill_size=2048, max_prefill_tokens=16384, max_running_requests=4, context_len=65536, available_gpu_mem=2.32 GB
+
+## llama.cpp: context overflow errors at 8 agents
+25.58.286.173 E srv        decode: Context size has been exceeded. off = 1561, n_batch = 1, ret = 1
+25.58.286.174 E srv    send_error: task id = 10569, error: Context size has been exceeded.
+25.58.407.916 E srv    send_error: task id = 10570, error: Context size has been exceeded.
+count: 10
+
+## Ollama: forced single request + runner args
+time=2026-09-23T08:49:04.743Z level=WARN source=sched.go:514 msg="model architecture does not currently support parallel requests" architecture=qwen35
+starting llama-server" cmd="/usr/local/lib/ollama/llama-server --model /workspace/ollama/models/blobs/sha256-f5f1dd8920d417aac2718b0bda3403da274301efdd6760b4f0f4b864ff2ad57d  --host 127.0.0.1 --no-webui --offline -c 32768 -np 1 --log-verbosity 4 --no-log-prefix --no-log-timestamps --no-jinja --chat-template chatml --mmproj /workspace/ollama/models/blobs/sha256-ac3714bfdddeca31351f2752bf1a63f266f4df87c0b68c895e44945ca704448e --spec-type draft-mtp --spec-draft-n-max 4 --spec-draft-backend-sampling --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on -b 512 -ub 512 --context-shift --keep 4
+
+## gpt-oss-20b (host 2)
+vLLM: INFO 09-24 18:23:26 [cuda.py:538] Using TRITON_ATTN attention backend out of potential backends: ['TRITON_ATTN'].
+vLLM: INFO 09-24 18:23:27 [mxfp4.py:616] Using 'MARLIN' Mxfp4 MoE backend.
+vLLM: INFO 09-24 18:23:52 [model_runner.py:428] Model loading took 13.7 GiB memory and 37.823491 seconds
+vLLM: INFO 09-24 18:24:56 [kv_cache_utils.py:2395] GPU KV cache size: 246,214 tokens, Maximum concurrency for 65,536 tokens per request: 3.76x
+SGLang: [2026-09-24 18:38:26] mxfp4 quantization is not fully optimized yet. The speed can be slower than non-quantized models.
+SGLang: [2026-09-24 18:38:26] Detected GPT-OSS model, enabling triton_kernels MOE kernel.
+Ollama runner for gpt-oss: -c 131072 -np 4
+Ollama gpt-oss "does not support parallel" warnings: 0

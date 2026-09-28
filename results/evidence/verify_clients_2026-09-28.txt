@@ -1,0 +1,31 @@
+# scripts/verify_clients.sh, 2026-09-28, through https://alphaexperiments.com/heretic-inference/v1
+# pi 0.84.2 and opencode 1.18.23, each with an isolated copy of the docs/CLIENTS.md config and the same task:
+#   "calc.py has a bug. Fix calc.py so that 'python3 -m unittest -q' passes. Do not edit test_calc.py."
+# Wall times are as the script printed them at the time. Everything else below was re-checked from the saved
+# working directories (/tmp/heretic-clients.*) when this file was written.
+
+## script output at the time
+pi tool calls: 5
+pi: PASS in 13 s (calc.py changed: 1 file changed, 2 insertions(+), 2 deletions(-))
+opencode tool uses: 5
+opencode: PASS in 22 s (calc.py changed: 1 file changed, 2 insertions(+), 2 deletions(-))
+
+## pi: re-check
+tests now: OK
+test_calc.py untouched: yes
+change the agent made to calc.py:
+-    return sum(xs) / len(xs) - 1
++    return sum(xs) / len(xs)
+-    return max(lo, min(x, lo))
++    return max(lo, min(x, hi))
+tool calls in the event log: 5
+
+## opencode: re-check
+tests now: OK
+test_calc.py untouched: yes
+change the agent made to calc.py:
+-    return sum(xs) / len(xs) - 1
++    return sum(xs) / len(xs)
+-    return max(lo, min(x, lo))
++    return max(lo, min(x, hi))
+tool uses in the event log: 5

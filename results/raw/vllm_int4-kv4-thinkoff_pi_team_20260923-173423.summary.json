@@ -1,0 +1,46 @@
+{
+ "meta": {
+  "engine": "vllm",
+  "tag": "int4-kv4-thinkoff",
+  "model": "qwen3.8-27b",
+  "scenario": "pi_team",
+  "base_url": "http://127.0.0.1:18000/v1",
+  "thinking": "off",
+  "started": "20260923-173423",
+  "argv": [
+   "--base-url",
+   "http://127.0.0.1:18000/v1",
+   "--engine",
+   "vllm",
+   "--tag",
+   "int4-kv4-thinkoff",
+   "--agents",
+   "1",
+   "--thinking",
+   "off",
+   "--keep"
+  ]
+ },
+ "cells": [
+  {
+   "cell": "pi_team_1",
+   "agents": 1,
+   "wall_s": 24.1,
+   "pass": 1,
+   "timeouts": 0,
+   "agent_wall_p50_s": 24.0,
+   "agent_wall_max_s": 24.0,
+   "rows": [
+    {
+     "agent": "stats-0",
+     "pi_rc": 0,
+     "wall_s": 24.0,
+     "tool_calls": 5,
+     "turns": 5,
+     "tests_pass": true,
+     "tests_tampered": false
+    }
+   ]
+  }
+ ]
+}

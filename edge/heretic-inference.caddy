@@ -1,0 +1,28 @@
+# EDGE (alphaexperiments.com). Imported inside the site block of /etc/caddy/Caddyfile by
+# `import /etc/caddy/apps.d/*.caddy`. Installed by edge/install.sh from the ~/4090 repo.
+
+# OpenAI-compatible model API for pi, opencode and the web app's server. It goes through the reverse SSH tunnel that
+# the GPU pod keeps open to 127.0.0.1:18443; the pod's gateway checks keys and tokens and serves /v1/* only.
+handle /heretic-inference/v1/* {
+	uri strip_prefix /heretic-inference
+	request_body {
+		max_size 8MB
+	}
+	reverse_proxy 127.0.0.1:18443 {
+		flush_interval -1
+		# A request can wait in vLLM's queue before the first byte comes back; allow up to 15 minutes for the response
+		# headers (the longest measured wait was 85 s). Once streaming starts there is no time limit here.
+		transport http {
+			response_header_timeout 15m
+		}
+	}
+}
+
+# Chat web app: Next.js on Vercel, built with basePath /heretic-inference.
+@heretic_web path /heretic-inference /heretic-inference/*
+handle @heretic_web {
+	reverse_proxy https://heretic-inference.vercel.app {
+		header_up Host {upstream_hostport}
+		flush_interval -1
+	}
+}

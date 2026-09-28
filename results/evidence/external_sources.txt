@@ -1,0 +1,23 @@
+## Checkpoint sizes from the Hugging Face API (2026-09-24T14:58:46Z); sum of .safetensors blobs, GiB
+Qwen/Qwen3.8-27B-FP8 28.75
+RedHatAI/Qwen3.8-27B-INT4 18.12
+
+## unsloth GGUF sizes (GiB)
+Qwen3.8-27B-UD-IQ4_XS.gguf 13.27
+Qwen3.8-27B-UD-Q4_K_XL.gguf 16.35
+Qwen3.8-27B-UD-Q5_K_M.gguf 18.41
+Muse-Glimmer-30B-UD-Q4_K_XL.gguf 14.79
+
+## Ollama registry manifest qwen3.8:27b (layer sizes, GiB)
+projector 0.87
+model 15.66
+license 0.0
+params 0.0
+
+## External references (not measured here)
+- Cloudflare proxied requests: HTTP 524 if the origin sends no response within 100 s (Cloudflare docs, 'Error 524')
+- RedHatAI/Qwen3.8-27B-INT4 model card: accuracy recovery IFEval 99.67%, MMLU-Pro 98.81%, GPQA Diamond 98.49%, AIME25 98.69%
+- Published KLD vs BF16 (AtomicChat GGUF card): UD-Q4_K_XL 0.00955. No published IQ4_XS-vs-Q4_K_XL accuracy comparison was found
+- Muse Glimmer 30B needs vLLM >= 0.28: vllm-project/vllm tree vllm/model_executor/models has muse_glimmer.py at tag v0.28.0 and not at v0.27.1 (checked with gh api, 2026-09-24)
+- gpt-oss-20b: 21B total parameters, 3.6B active per token (OpenAI model card); checkpoint 12.81 GiB from the HF API (safetensors, excluding original/ and metal/)
+- Ollama's gpt-oss:20b GGUF names the architecture "gptoss"; upstream llama.cpp b11118 rejects it ("unknown model architecture: 'gptoss'"), so llama.cpp used ggml-org/gpt-oss-20b-GGUF gpt-oss-20b-MXFP4.gguf (11.28 GiB)

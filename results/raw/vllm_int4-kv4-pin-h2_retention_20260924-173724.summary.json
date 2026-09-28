@@ -1,0 +1,87 @@
+{
+ "meta": {
+  "engine": "vllm",
+  "tag": "int4-kv4-pin-h2",
+  "model": "qwen3.8-27b",
+  "scenario": "retention",
+  "base_url": "http://127.0.0.1:8000/v1",
+  "api": "openai",
+  "think": false,
+  "client_host": "d6c81a8fafb5",
+  "started": "20260924-173724",
+  "argv": [
+   "--base-url",
+   "http://127.0.0.1:8000/v1",
+   "--api-key",
+   "***",
+   "--model",
+   "qwen3.8-27b",
+   "--engine",
+   "vllm",
+   "--tag",
+   "int4-kv4-pin-h2",
+   "--out",
+   "/workspace/results/raw",
+   "retention",
+   "--background",
+   "0",
+   "--delays",
+   "5",
+   "60",
+   "300",
+   "900",
+   "--prefix-request",
+   "/workspace/4090/bench/pi_opening_request.json"
+  ]
+ },
+ "cells": [
+  {
+   "cell": "retention_bg0_d5",
+   "background_agents": 0,
+   "idle_s": 5,
+   "ok": true,
+   "context_tokens": 13372,
+   "cached_tokens": 12416,
+   "cached_share": 0.929,
+   "ttft_s": 10.957,
+   "cold_build_ttft_s": 6.142,
+   "error": null
+  },
+  {
+   "cell": "retention_bg0_d60",
+   "background_agents": 0,
+   "idle_s": 60,
+   "ok": true,
+   "context_tokens": 11609,
+   "cached_tokens": 10864,
+   "cached_share": 0.936,
+   "ttft_s": 0.416,
+   "cold_build_ttft_s": 9.014,
+   "error": null
+  },
+  {
+   "cell": "retention_bg0_d300",
+   "background_agents": 0,
+   "idle_s": 300,
+   "ok": true,
+   "context_tokens": 12864,
+   "cached_tokens": 12416,
+   "cached_share": 0.965,
+   "ttft_s": 0.286,
+   "cold_build_ttft_s": 13.087,
+   "error": null
+  },
+  {
+   "cell": "retention_bg0_d900",
+   "background_agents": 0,
+   "idle_s": 900,
+   "ok": true,
+   "context_tokens": 12413,
+   "cached_tokens": 10864,
+   "cached_share": 0.875,
+   "ttft_s": 0.827,
+   "cold_build_ttft_s": 15.74,
+   "error": null
+  }
+ ]
+}

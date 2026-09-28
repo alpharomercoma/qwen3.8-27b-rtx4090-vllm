@@ -1,0 +1,38 @@
+# Network path measurements behind docs/ARCHITECTURE.md → "The network path". 2026-09-28, pod fc4hpfr74k69ri
+# (RunPod community host, Wyoming, US), edge alphaexperiments.com (Huawei Cloud, Manila), laptop in the Philippines.
+# Transcribed from the command output during the session (the raw terminal output was not saved separately).
+# Tools: bench/ttft_probe.py, bench/upload_probe.py, ping, ss -ti.
+
+## Packet loss and round trips (ping, 0.2 s interval)
+laptop -> pod        30 sent, 23.3% loss, rtt avg 185.1 ms
+laptop -> edge       30 sent,  0.0% loss, rtt avg   9.98 ms
+pod    -> edge       30 sent, 16.7% loss, rtt avg 204.9 ms
+pod    -> 1.1.1.1    30 sent, 13.3% loss, rtt avg  14.2 ms
+edge   -> pod        20 sent, 15.0% loss, rtt avg 200.5 ms
+
+## The tunnel's TCP connection before tuning (ss -ti)
+edge side (sender to the pod, cubic): rtt 209.4 ms, cwnd 10, ssthresh 7, bytes_sent 22,113,489, bytes_retrans 610,940 (2.76%), 466 retransmit events
+pod side (bbr):                        rtt 206.6 ms, cwnd 214, bytes_retrans 39,586, 63 retransmit events
+
+## Time to first token, idle server, fresh random prompt each time, 3 s gap between requests (bench/ttft_probe.py)
+                          ~100-token prompt (median)   "7000-word" prompt (~25k tokens; median)
+pod -> gateway            0.136 s                      9.661 s
+edge -> tunnel            0.549 s                      12.379 s
+laptop -> public URL      0.359 s                      12.014 s
+
+## A 40-41 KB prompt sent twice; the repeats hit vLLM's prefix cache, so their time is mostly transfer (bench/upload_probe.py)
+                                   first (prefill)   repeats (cached)
+pod -> gateway                     9.63 s            0.905  0.907  0.905  0.910
+before tuning   edge -> tunnel     15.09 s           2.956  3.211  4.647  2.128
+                laptop -> public   10.80 s           2.895  1.812  3.555  1.840
+edge BBR only   edge -> tunnel     10.84 s           3.421  1.630  1.632  2.062
+                laptop -> public   10.12 s           2.437  1.644  1.507  2.727
+BBR + ssh -C    edge -> tunnel     10.33 s           1.445  2.373  2.594  1.421
+                laptop -> public   10.30 s           1.477  1.927  1.545  2.027
+
+## Streaming through the edge (curl --compressed, 200 tokens, during the on-pod load test)
+113 SSE chunks, first at 7.29 s, last at 37.62 s; response had no Content-Encoding (Caddy does not compress text/event-stream)
+
+## Tunnel recovery
+ssh client process killed on the pod at 07:35:28 UTC; public /v1/models answered 502, then 200 after 13 s
+(the reconnect loop then waited 10 s between tries; it now waits 5 s)

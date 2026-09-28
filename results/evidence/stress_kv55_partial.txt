@@ -1,0 +1,19 @@
+# heretic-kv55: KV pool pinned at 5.5 GiB instead of 4.5 GiB (pod/serve.sh heretic-kv55), pod fc4hpfr74k69ri, 2026-09-28.
+# The user stopped the run after the 8- and 12-agent cells; the 16-agent and team cells did not finish, and the pod
+# was shut down before the raw files were copied. The lines below were transcribed from the live log output
+# (/workspace/logs/stress_kv55.log, /workspace/logs/serve_heretic-kv55.log, vram_heretic-kv55-pod.csv) during the session.
+# Not adopted: production runs pod/serve.sh heretic (4.5 GiB, 246,094 tokens).
+
+vLLM:  GPU KV cache size: 300,930 tokens, Maximum concurrency for 65,536 tokens per request: 4.59x
+idle GPU memory after start: 23,446 MiB of 24,564
+
+cell        requests  errors  turn TTFT p50  p90     tok/s per user p50  input from cache
+agent_u8    64        0       4.769 s        7.998 s  33.8               69.6%
+agent_u12   96        0       6.982 s        11.039 s 22.3               69.9%
+
+peak GPU memory while the two cells ran: 23,886 MiB of 24,564 (678 MiB free)
+out-of-memory or CUDA errors in the server log at the last check: 0
+
+Same cells with the production pool (results/raw/vllm_heretic-pod_agent_20260928-062200.summary.json):
+agent_u8    64        0       4.745 s        7.550 s  27.7               69.7%
+agent_u12   96        0       7.042 s        20.246 s 18.3               47.6%
