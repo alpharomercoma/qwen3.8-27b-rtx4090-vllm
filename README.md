@@ -1,7 +1,7 @@
-# Heretic inference
+# Qwen3.8-27B on one RTX 4090 with vLLM
 
-The team's self-hosted chat and API for Qwen3.8-27B, served by vLLM on one rented RTX 4090. The GPU runs one of two
-builds at a time, chosen on the pod:
+The team's self-hosted chat and API for Qwen3.8-27B ("Heretic inference", at alphaexperiments.com/heretic-inference),
+served by vLLM on one rented RTX 4090. The GPU runs one of two builds at a time, chosen on the pod:
 
 | Model | Served as | What it is |
 |---|---|---|
