@@ -12,7 +12,7 @@ Setting it up from scratch: [DEPLOY.md](DEPLOY.md). Running it: [OPERATIONS.md](
       (team key)          │
                           ▼ 127.0.0.1:18443 on the edge = reverse SSH tunnel, opened by the pod (no inbound port)
                      RunPod pod (RTX 4090):  gateway 127.0.0.1:8443 (Caddy) ──asks──▶ authz.py :8444 (key or OIDC)
-                                              └──▶ vLLM 127.0.0.1:8000 serving qwen3.8-27b-heretic
+                                              └──▶ vLLM 127.0.0.1:8000 serving qwen3.8-27b-heretic or qwen3.8-27b
 ```
 
 ## The pieces
@@ -24,7 +24,7 @@ Setting it up from scratch: [DEPLOY.md](DEPLOY.md). Running it: [OPERATIONS.md](
 | Tunnel | pod → `heretic-tunnel@alphaexperiments.com` | edge `127.0.0.1:18443` | `ssh -N -R`: the pod dials out and the edge gets a local port that leads to the pod's gateway | `pod/gateway/edge_tunnel.sh`, `edge/sshd-heretic-tunnel.conf` |
 | Gateway | pod | `127.0.0.1:8443` | Caddy. Serves only `/v1/*` and `/healthz`, asks `authz.py` about every request, then calls vLLM with vLLM's own key | `pod/gateway/Caddyfile` |
 | authz | pod | `127.0.0.1:8444` | Python. Allows a team API key or a Vercel OIDC token; everything else gets 401 | `pod/gateway/authz.py`, `authz.env`, `keys.sh` |
-| vLLM | pod (RTX 4090, 24 GB) | `127.0.0.1:8000` | vLLM 0.30.0 serving the model as `qwen3.8-27b-heretic` | `pod/serve.sh heretic` |
+| vLLM | pod (RTX 4090, 24 GB) | `127.0.0.1:8000` | vLLM 0.30.0 serving one of two models (below) as `qwen3.8-27b-heretic` or `qwen3.8-27b` | `pod/serve.sh`, `pod/models.sh` |
 
 ## A chat message, step by step
 
@@ -41,15 +41,30 @@ Setting it up from scratch: [DEPLOY.md](DEPLOY.md). Running it: [OPERATIONS.md](
 
 A CLI request is the same from step 4 on, with a team key instead of the OIDC token.
 
-## Model and server settings
+The web app does not need to be told which model runs: it asks the pod (`GET /v1/models`, remembered for a minute)
+and sends chats to that id; the status poll carries the model's name and description to the UI.
+
+## The two models
+
+One runs at a time; `pod/start.sh heretic|original` chooses ([OPERATIONS.md → Switch model](OPERATIONS.md#switch-model)).
+
+| | `heretic` (default) | `original` |
+|---|---|---|
+| What | The official Heretic (ARA) abliteration of Qwen3.8-27B (`heretic-org/Qwen3.8-27B-heretic-ara`; `trohrbaugh/…` has byte-identical weights). Answers requests the original refuses | Qwen3.8-27B as Qwen released it |
+| Checkpoint | `JC1DA/Qwen3.8-27B-heretic-ara-W4A16`, commit `0a19146` | `RedHatAI/Qwen3.8-27B-INT4`, commit `91bd022` (weights unchanged since the benchmarks) |
+| Quantization | 4-bit weights, 16-bit activations: AutoRound, group 128, symmetric, 1000 tuning iterations, from the official weights | 4-bit weights, 16-bit activations: AWQ smoothing then GPTQ (llm-compressor, `recipe.yaml`), group 128, symmetric |
+| Size | 18.2 GiB; 16.59 GiB in VRAM (`--language-model-only` skips the vision tower) | 18.1 GiB |
+| Kept in 16 bit | vision tower, MTP head, norms, conv1d, some `in_proj_a/b` | vision tower, `lm_head`, embeddings, `in_proj_a/b`, MTP head |
+| vLLM kernel | Marlin INT4 (loads AutoRound as `inc`) | Marlin INT4 (loads it as `compressed-tensors`) |
+| Served as | `qwen3.8-27b-heretic` | `qwen3.8-27b` |
+| Measured | this page (2026-09-28) | [benchmarks/REPORT.md](benchmarks/REPORT.md) (2026-09-23/24, same settings: `vllm-int4-kv4-pin`) |
+
+Both are pinned to a Hugging Face commit and every file is checked against `pod/models/<name>.sha256`.
+
+## Server settings (both models)
 
 | Setting | Value | Why |
 |---|---|---|
-| Model | `heretic-org/Qwen3.8-27B-heretic-ara`, the official Heretic (ARA) abliteration of Qwen3.8-27B | The requested model. `trohrbaugh/Qwen3.8-27B-heretic-ara` has byte-identical weights |
-| Checkpoint | `JC1DA/Qwen3.8-27B-heretic-ara-W4A16`, commit `0a19146` (files checked by SHA-256) | 4-bit weights, 16-bit activations. AutoRound, group size 128, symmetric, 1000 tuning iterations, quantized from the official weights. 18.2 GiB |
-| Kept in 16 bit | vision tower, MTP head, norms, conv1d, some `in_proj_a/b` | From the checkpoint's quantization config |
-| Kernel | Marlin INT4 (vLLM loads AutoRound as `inc`) | vLLM log |
-| Weights in VRAM | 16.59 GiB (`--language-model-only` skips the vision tower) | vLLM log |
 | KV cache | int4 per token and head, Triton attention, pinned at 4.5 GiB = **246,094 tokens** shared by all requests | The benchmark study's recommended config; pinning avoids a runtime out-of-memory seen with `--gpu-memory-utilization` |
 | Per request | 65,536 tokens (prompt + answer) | The pool holds 3.76 full-length requests, many more typical ones |
 | Running at once | 16; more wait in vLLM's queue (first come, first served) | |
@@ -63,7 +78,9 @@ Why vLLM and not Ollama, llama.cpp or SGLang, and why this quant size: [benchmar
 
 ## Performance
 
-Measured 2026-09-28 with `bench/loadgen.py`, zero errors in every cell. "On the pod" talks to vLLM directly;
+Measured 2026-09-28 on the **Heretic** model with `bench/loadgen.py`, zero errors in every cell. The original model
+with the same settings, measured on the pod in the benchmark study: 1 agent 0.8 s per turn at 50 tok/s, 8 agents
+4.9 s at 30 tok/s, 16 agents 16.5 s at 6 tok/s ([benchmarks/REPORT.md → Capacity](benchmarks/REPORT.md#capacity-of-the-recommended-config)). "On the pod" talks to vLLM directly;
 "Public URL" runs from a laptop in the Philippines through the edge, the tunnel and the gateway. Tables generated
 by `python3 bench/service_tables.py` from `results/raw/vllm_heretic-*.summary.json`.
 

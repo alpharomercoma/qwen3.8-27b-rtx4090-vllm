@@ -7,13 +7,14 @@ Step-by-step use: [docs/DEPLOY.md](../docs/DEPLOY.md) and [docs/OPERATIONS.md](.
 
 | File | What it is |
 |---|---|
-| `start.sh` | Brings everything up, skipping finished steps: bootstrap → vLLM install → model download → vLLM → gateway → tunnel |
+| `start.sh [heretic\|original]` | Brings everything up, skipping finished steps: bootstrap → vLLM install → model download → vLLM → gateway → tunnel → public check. Remembers the model in `/workspace/.model` |
+| `models.sh` | The two models the service can serve: Hugging Face repo, pinned commit, local directory, served name |
 | `env.sh` | Sourced by every script: caches on `/workspace`, `PATH`, and `killp` (kill by pattern, never tmux) |
 | `bootstrap.sh` | Fresh container: apt tools, CUDA 12.8 compiler, uv, `hf`, vLLM's own key in `/workspace/.api_key` |
 | `install_vllm.sh` | vLLM 0.30.0 (CUDA 12.9 build) in `/workspace/venvs/vllm`, with the CUDA 12.9 `torchcodec` |
-| `fetch_model.sh` | Downloads `JC1DA/Qwen3.8-27B-heretic-ara-W4A16` (AutoRound W4A16 of the official Heretic model) at a pinned commit and checks it |
-| `qwen38-heretic-ara-w4a16.sha256` | SHA-256 of every file of that commit |
-| `serve.sh` | Starts one named server config in tmux `serve`. Production: `serve.sh heretic`. `serve.sh list` shows all |
+| `fetch_model.sh heretic\|original` | Downloads that model at its pinned commit, checks free space first and every file's SHA-256 after |
+| `models/heretic.sha256`, `models/original.sha256` | SHA-256 of every file of each pinned commit |
+| `serve.sh` | Starts one named server config in tmux `serve`. Production: `serve.sh heretic` or `serve.sh original` (same settings). `serve.sh list` shows all |
 | `gateway/Caddyfile` | The gateway on `127.0.0.1:8443`: `/v1/*` only, asks `authz.py`, calls vLLM with vLLM's key |
 | `gateway/authz.py` | Allows team API keys (`/workspace/.team_api_keys`) and the web app's Vercel OIDC token |
 | `gateway/authz.env` | Which Vercel team, project and environments may call the API (not secret) |

@@ -1,12 +1,16 @@
 #!/bin/bash
 # MAC. End-to-end check of the API-key route with the real CLI harnesses, through the public URL:
-# pi and opencode each get an isolated config (the same snippets the web app's "Use from the terminal" dialog shows)
-# and a small bug-fix task; pass = the task's tests pass and the test file is untouched.
+# pi and opencode each get an isolated config (the same two-model provider as docs/CLIENTS.md and the web app's
+# "Use from the terminal" dialog) and a small bug-fix task, run on whichever model the server serves;
+# pass = the task's tests pass and the test file is untouched.
 # usage: HERETIC_API_KEY=... scripts/verify_clients.sh [pi|opencode|all]
 set -uo pipefail
 : "${HERETIC_API_KEY:?export HERETIC_API_KEY (team key)}"
 BASE=${HERETIC_BASE_URL:-https://alphaexperiments.com/heretic-inference/v1}
-MODEL=qwen3.8-27b-heretic
+# the model being served (pod/models.sh: qwen3.8-27b-heretic or qwen3.8-27b)
+MODEL=$(curl -sf "$BASE/models" -H "Authorization: Bearer $HERETIC_API_KEY" | python3 -c "import json,sys; print(json.load(sys.stdin)['data'][0]['id'])" 2>/dev/null) ||
+  { echo "the server does not answer $BASE/models with this key" >&2; exit 1; }
+echo "testing on $MODEL"
 WORK=$(mktemp -d /tmp/heretic-clients.XXXXXX)
 PROMPT="calc.py has a bug. Fix calc.py so that 'python3 -m unittest -q' passes. Do not edit test_calc.py. Run the tests to confirm."
 
@@ -56,7 +60,9 @@ run_pi() {
 {"providers": {"heretic": {"baseUrl": "$BASE", "api": "openai-completions", "apiKey": "\$HERETIC_API_KEY",
   "compat": {"supportsDeveloperRole": false, "supportsReasoningEffort": false, "thinkingFormat": "qwen-chat-template",
              "maxTokensField": "max_tokens"},
-  "models": [{"id": "$MODEL", "name": "Qwen3.8-27B Heretic", "reasoning": true, "input": ["text"],
+  "models": [{"id": "qwen3.8-27b-heretic", "name": "Qwen3.8-27B Heretic", "reasoning": true, "input": ["text"],
+              "contextWindow": 65536, "maxTokens": 16384, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}},
+             {"id": "qwen3.8-27b", "name": "Qwen3.8-27B", "reasoning": true, "input": ["text"],
               "contextWindow": 65536, "maxTokens": 16384, "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0}}]}}}
 JSON
   make_repo "$WORK/pi-repo"
@@ -73,7 +79,8 @@ run_opencode() {
 {"\$schema": "https://opencode.ai/config.json",
  "provider": {"heretic": {"npm": "@ai-sdk/openai-compatible", "name": "Heretic (team RTX 4090)",
    "options": {"baseURL": "$BASE", "apiKey": "{env:HERETIC_API_KEY}"},
-   "models": {"$MODEL": {"name": "Qwen3.8-27B Heretic", "limit": {"context": 65536, "output": 16384}}}}}}
+   "models": {"qwen3.8-27b-heretic": {"name": "Qwen3.8-27B Heretic", "limit": {"context": 65536, "output": 16384}},
+              "qwen3.8-27b": {"name": "Qwen3.8-27B", "limit": {"context": 65536, "output": 16384}}}}}}
 JSON
   make_repo "$WORK/oc-repo"
   local t0=$SECONDS

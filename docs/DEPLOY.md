@@ -8,7 +8,7 @@ What the pieces are: [ARCHITECTURE.md](ARCHITECTURE.md). Day-to-day tasks afterw
 | Item | Details |
 |---|---|
 | A RunPod GPU pod | RTX 4090 (24 GB), driver 570 or newer (CUDA 12.8+), a volume at `/workspace` of at least 50 GB, public IP with SSH over TCP |
-| The edge server | Root SSH to the server that serves `alphaexperiments.com` with Caddy (today: the PengePassportPH box) |
+| The edge server | Root SSH to the server that serves `alphaexperiments.com` with Caddy (today it also hosts PengePassportPH, which owns its Caddyfile) |
 | Vercel | Team `alpharomercoma-projects` (Hobby works) and the Vercel CLI, logged in |
 | Your Mac | `ssh` with `~/.ssh/id_ed25519` authorized on the pod and the edge, `jq`, Node 22+, `uv` (only for benchmarks) |
 
@@ -35,6 +35,9 @@ scripts/push.sh                                               # copies pod/, ben
 POD_TIMEOUT=1800 scripts/pod.sh <<<'bash /workspace/4090/pod/start.sh'           # first run ~15-25 min (downloads, compile), later ~2 min
 ```
 
+This serves the Heretic model. For Qwen3.8-27B as released, end the second line with `start.sh original'` instead;
+[OPERATIONS.md → Switch model](OPERATIONS.md#switch-model) explains both and how to change later.
+
 `POD_TIMEOUT=1800` gives the SSH call 30 minutes (`scripts/pod.sh` stops a call after 10 minutes by default). If it does
 time out, run the same line again: `start.sh` picks up where it stopped. `pod/start.sh` skips whatever is already done:
 
@@ -42,8 +45,8 @@ time out, run the same line again: `start.sh` picks up where it stopped. `pod/st
 |---|---|---|
 | Tools | `pod/bootstrap.sh` | apt: tmux, jq, CUDA 12.8 compiler (FlashInfer compiles kernels on first use); uv 0.12.19 (checksum-verified); the `hf` CLI; creates vLLM's own key in `/workspace/.api_key` |
 | vLLM | `pod/install_vllm.sh` | the vLLM 0.30.0 wheel built for CUDA 12.9 (checksum-verified) in `/workspace/venvs/vllm`, and swaps `torchcodec` for its CUDA 12.9 build (the default one needs CUDA 13 and crashes vLLM on import) |
-| Model | `pod/fetch_model.sh` | downloads `JC1DA/Qwen3.8-27B-heretic-ara-W4A16` at a pinned commit (18.2 GiB) to `/workspace/models/qwen38-heretic-ara-w4a16` and checks every file against `pod/qwen38-heretic-ara-w4a16.sha256` |
-| Server | `pod/serve.sh heretic` | starts vLLM in tmux session `serve` on `127.0.0.1:8000` and waits until it answers (first boot compiles for ~4 min) |
+| Model | `pod/fetch_model.sh <model>` | downloads the chosen model (`pod/models.sh`: Heretic `JC1DA/Qwen3.8-27B-heretic-ara-W4A16`, or original `RedHatAI/Qwen3.8-27B-INT4`) at its pinned commit, ~18 GiB, to `/workspace/models/`, and checks every file against `pod/models/<model>.sha256` |
+| Server | `pod/serve.sh <model>` | starts vLLM in tmux session `serve` on `127.0.0.1:8000`; `start.sh` then waits until it serves that model (first boot compiles for ~4 min) |
 | Gateway | `pod/gateway/run.sh` | starts `authz.py` (tmux `authz`, `127.0.0.1:8444`) and Caddy (tmux `gateway`, `127.0.0.1:8443`); creates the first team key, labelled `team`, if there is none |
 | Tunnel | `pod/gateway/edge_tunnel.sh` | creates the pod's tunnel key (`/workspace/.secrets/edge_tunnel_ed25519`) and keeps `ssh -R 127.0.0.1:18443:127.0.0.1:8443 heretic-tunnel@alphaexperiments.com` open (tmux `edge`), retrying every 5 s |
 | Public check | `pod/start.sh` | calls `https://alphaexperiments.com/heretic-inference/v1/models` without a key: `401` from the gateway means the whole path works and it prints `up`. On a brand-new pod this fails with "is this pod's tunnel key installed on the edge": expected until step 4 |
@@ -74,7 +77,7 @@ POD_PUBKEY="$(scripts/pod.sh <<<'bash /workspace/4090/pod/gateway/edge_tunnel.sh
 | System user `heretic-tunnel` (no shell) whose only key is the pod's, marked `restrict,port-forwarding,permitlisten="127.0.0.1:18443"` | The pod can open exactly one port on the edge's loopback, and nothing else |
 | `/etc/ssh/sshd_config.d/20-heretic-tunnel.conf` | The same limits in sshd (no TTY, no other forwarding), and dead tunnels dropped within ~45 s |
 | `/etc/sysctl.d/60-heretic-tunnel.conf` | BBR congestion control and no slow start after idle: the path to the pod is long and lossy |
-| `/etc/caddy/apps.d/heretic-inference.caddy` + an `import /etc/caddy/apps.d/*.caddy` line in the site block | The two `/heretic-inference` routes. The same import line belongs in PengePassportPH's `deploy/caddy/Caddyfile.template`, or its next provisioning drops the routes |
+| `/etc/caddy/apps.d/heretic-inference.caddy` + an `import /etc/caddy/apps.d/*.caddy` line in the site block | The two `/heretic-inference` routes. The Caddyfile belongs to the server's other project; if it is regenerated and loses the line, rerun `scripts/edge.sh install` |
 
 `edge/known_hosts` pins the edge server's SSH host keys, for both `scripts/edge.sh` and the pod's tunnel. If the
 server is replaced, refresh it over a connection you trust.
@@ -119,7 +122,7 @@ None of it is secret: they are claims inside a token that Vercel signs.
 
 | Check | Command | Pass |
 |---|---|---|
-| API and keys | `curl` from step 4 | JSON with `qwen3.8-27b-heretic` |
+| API and keys | `curl` from step 4 | JSON with the served model: `qwen3.8-27b-heretic`, or `qwen3.8-27b` for the original |
 | pi and opencode | `HERETIC_API_KEY=... scripts/verify_clients.sh` | both `PASS` |
 | Web app | `cd apps/web && E2E_PASSWORD=... npm run e2e` (Playwright drives your installed Google Chrome) | all tests pass |
 | By hand | open https://alphaexperiments.com/heretic-inference | status pill says Online, answers stream |

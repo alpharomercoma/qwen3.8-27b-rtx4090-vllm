@@ -2,9 +2,13 @@
 
 import { Check, Copy, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { API_BASE_URL, CONTEXT_TOKENS, MODEL_ID, MODEL_NAME } from "@/lib/config";
+import { API_BASE_URL, CONTEXT_TOKENS, MODELS } from "@/lib/config";
+import { useLiveModel } from "./server-status";
 
-// The same single-line commands as docs/CLIENTS.md: they add one provider and keep any others in the config file.
+// The same single-line commands as docs/CLIENTS.md: they add one provider (with both models the pod can serve) and
+// keep any other providers in the config file. Only the model that is live answers; the other returns 404.
+const MODEL_IDS = Object.keys(MODELS);
+
 const PI_PROVIDER = {
   baseUrl: API_BASE_URL,
   api: "openai-completions",
@@ -15,24 +19,24 @@ const PI_PROVIDER = {
     thinkingFormat: "qwen-chat-template",
     maxTokensField: "max_tokens",
   },
-  models: [
-    {
-      id: MODEL_ID,
-      name: MODEL_NAME,
-      reasoning: true,
-      input: ["text"],
-      contextWindow: CONTEXT_TOKENS,
-      maxTokens: 16384,
-      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-    },
-  ],
+  models: MODEL_IDS.map((id) => ({
+    id,
+    name: MODELS[id].name,
+    reasoning: true,
+    input: ["text"],
+    contextWindow: CONTEXT_TOKENS,
+    maxTokens: 16384,
+    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+  })),
 };
 
 const OPENCODE_PROVIDER = {
   npm: "@ai-sdk/openai-compatible",
   name: "Heretic (team RTX 4090)",
   options: { baseURL: API_BASE_URL, apiKey: "{env:HERETIC_API_KEY}" },
-  models: { [MODEL_ID]: { name: MODEL_NAME, limit: { context: CONTEXT_TOKENS, output: 16384 } } },
+  models: Object.fromEntries(
+    MODEL_IDS.map((id) => [id, { name: MODELS[id].name, limit: { context: CONTEXT_TOKENS, output: 16384 } }]),
+  ),
 };
 
 const PI_FILE = "~/.pi/agent/models.json";
@@ -40,24 +44,31 @@ const OC_FILE = "~/.config/opencode/opencode.json";
 
 const KEY_STEP = "echo 'export HERETIC_API_KEY=sk-heretic-PASTE-YOUR-KEY-HERE' >> ~/.zshrc && source ~/.zshrc";
 
-const PI_STEPS = [
-  `mkdir -p ~/.pi/agent && [ -f ${PI_FILE} ] || echo '{"providers":{}}' > ${PI_FILE}`,
-  `cp ${PI_FILE} ${PI_FILE}.bak`,
-  `jq '.providers.heretic = ${JSON.stringify(PI_PROVIDER)}' ${PI_FILE} > ${PI_FILE}.tmp && mv ${PI_FILE}.tmp ${PI_FILE}`,
-  `pi --model heretic/${MODEL_ID}`,
-].join("\n");
+const piSteps = (id: string) =>
+  [
+    `mkdir -p ~/.pi/agent && [ -f ${PI_FILE} ] || echo '{"providers":{}}' > ${PI_FILE}`,
+    `cp ${PI_FILE} ${PI_FILE}.bak`,
+    `jq '.providers.heretic = ${JSON.stringify(PI_PROVIDER)}' ${PI_FILE} > ${PI_FILE}.tmp && mv ${PI_FILE}.tmp ${PI_FILE}`,
+    `pi --model heretic/${id}`,
+  ].join("\n");
 
-const OPENCODE_STEPS = [
-  `mkdir -p ~/.config/opencode && [ -f ${OC_FILE} ] || echo '{"$schema":"https://opencode.ai/config.json"}' > ${OC_FILE}`,
-  `cp ${OC_FILE} ${OC_FILE}.bak`,
-  `jq '.provider.heretic = ${JSON.stringify(OPENCODE_PROVIDER)}' ${OC_FILE} > ${OC_FILE}.tmp && mv ${OC_FILE}.tmp ${OC_FILE}`,
-  `opencode run -m heretic/${MODEL_ID} "hello"`,
-].join("\n");
+const opencodeSteps = (id: string) =>
+  [
+    `mkdir -p ~/.config/opencode && [ -f ${OC_FILE} ] || echo '{"$schema":"https://opencode.ai/config.json"}' > ${OC_FILE}`,
+    `cp ${OC_FILE} ${OC_FILE}.bak`,
+    `jq '.provider.heretic = ${JSON.stringify(OPENCODE_PROVIDER)}' ${OC_FILE} > ${OC_FILE}.tmp && mv ${OC_FILE}.tmp ${OC_FILE}`,
+    `opencode run -m heretic/${id} "hello"`,
+  ].join("\n");
 
-const CURL = `curl ${API_BASE_URL}/chat/completions -H "Authorization: Bearer $HERETIC_API_KEY" -H "Content-Type: application/json" -d '{"model": "${MODEL_ID}", "messages": [{"role": "user", "content": "Hello"}]}'`;
+const curl = (id: string) =>
+  `curl ${API_BASE_URL}/chat/completions -H "Authorization: Bearer $HERETIC_API_KEY" -H "Content-Type: application/json" -d '{"model": "${id}", "messages": [{"role": "user", "content": "Hello"}]}'`;
 
 export function ApiAccessDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const served = useLiveModel();
+  // while the server does not say which model is live (starting, switching, stopped), show a placeholder rather than
+  // a command that may 404
+  const id = served?.id ?? "<model id>";
 
   useEffect(() => {
     const dialog = ref.current;
@@ -82,7 +93,7 @@ export function ApiAccessDialog({ open, onClose }: { open: boolean; onClose: () 
             </h2>
             <p className="mt-1 text-sm text-muted">
               Any OpenAI-compatible client works. Ask the team for an API key. Each line below is one command; the
-              config steps add this model and keep your other providers.
+              config steps add both models the server can run and keep your other providers.
             </p>
           </div>
           <button type="button" onClick={onClose} className="ml-auto rounded-lg p-1.5 text-muted hover:bg-sunken hover:text-ink" aria-label="Close">
@@ -92,15 +103,29 @@ export function ApiAccessDialog({ open, onClose }: { open: boolean; onClose: () 
         <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
           <dt className="text-muted">Base URL</dt>
           <dd className="break-all font-mono">{API_BASE_URL}</dd>
-          <dt className="text-muted">Model</dt>
-          <dd className="font-mono">{MODEL_ID}</dd>
+          <dt className="text-muted">Serving now</dt>
+          <dd>
+            {served ? (
+              <>
+                {served.name} <span className="font-mono">({served.id})</span>
+              </>
+            ) : (
+              "unknown: the GPU server does not answer right now"
+            )}
+          </dd>
+          <dt className="text-muted">Models</dt>
+          <dd className="font-mono">{MODEL_IDS.join(", ")}</dd>
           <dt className="text-muted">Context</dt>
           <dd>{CONTEXT_TOKENS.toLocaleString("en-US")} tokens per request</dd>
         </dl>
         <Snippet title="1. Your key" code={KEY_STEP} hint="Replace the placeholder with your key. Use ~/.bashrc if your shell is bash." />
-        <Snippet title="2. pi" code={PI_STEPS} hint="Creates the config if missing, backs it up, adds the provider, starts pi. Needs jq." />
-        <Snippet title="2. opencode" code={OPENCODE_STEPS} hint="Same steps for opencode. In the TUI, pick the model with /models." />
-        <Snippet title="Or plain curl" code={CURL} />
+        <Snippet
+          title="2. pi"
+          code={piSteps(id)}
+          hint="Creates the config if missing, backs it up, adds the provider with both models, starts pi on the one being served. Needs jq."
+        />
+        <Snippet title="2. opencode" code={opencodeSteps(id)} hint="Same steps for opencode. In the TUI, pick the model with /models." />
+        <Snippet title="Or plain curl" code={curl(id)} />
       </div>
     </dialog>
   );

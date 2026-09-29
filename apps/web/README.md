@@ -10,7 +10,8 @@ that path to `heretic-inference.vercel.app`, and the app is built with `basePath
 | `src/app/actions.ts` | `unlock` / `lock` server actions |
 | `src/app/api/chat/route.ts` | `streamText` to vLLM through `@ai-sdk/openai-compatible`; streams reasoning and per-answer timings |
 | `src/app/api/status/route.ts` | Round trip to the GPU server for the status pill |
-| `src/lib/inference.ts` | Auth to the GPU gateway: Vercel OIDC token on Vercel, `INFERENCE_API_KEY` locally |
+| `src/lib/inference.ts` | Auth to the GPU gateway (Vercel OIDC token on Vercel, `INFERENCE_API_KEY` locally) and which model the pod serves |
+| `src/lib/config.ts` | URLs, limits, and the name and description shown for each model id (`MODELS`) |
 | `src/lib/session.ts` | HMAC-signed session cookie |
 | `src/lib/chat-store.ts` | Chats and settings in `localStorage` (nothing stored server-side) |
 | `src/components/` | Sidebar, conversation, messages (Streamdown markdown, code, math), composer, terminal dialog |
@@ -24,6 +25,7 @@ that path to `heretic-inference.vercel.app`, and the app is built with `basePath
 | `SESSION_SECRET` | Vercel (production, sensitive) | 32+ random characters; changing it signs everyone out |
 | `INFERENCE_API_KEY` | local only | a team key; on Vercel the OIDC token is used instead |
 | `INFERENCE_BASE_URL` | optional | defaults to `https://alphaexperiments.com/heretic-inference/v1` |
+| `INFERENCE_MODEL` | optional | pins a model id. Unset (normal): the app asks the pod which model it serves (`/v1/models`) and follows a switch by itself |
 
 ## Run locally
 

@@ -36,7 +36,7 @@ considered, and what is still weak. Decided 2026-09-28.
 | Browser side | `apps/web/next.config.ts` | `frame-ancestors 'none'`, `nosniff`, `no-referrer`, `noindex`; server-action origin pinned to `alphaexperiments.com` |
 | Secrets on Vercel | project env | `APP_PASSWORD`, `SESSION_SECRET` (sensitive). **No inference key**: the function gets its OIDC token per request |
 | Chats | browser `localStorage` | The server keeps no conversation. Clearing site data deletes them |
-| Downloads on the pod | `pod/bootstrap.sh`, `pod/install_vllm.sh`, `pod/gateway/run.sh` | uv 0.12.19, the vLLM 0.30.0 wheel and Caddy 2.10.2 are pinned and checked against published SHA-256 / SHA-512 before use. The model is pinned to one Hugging Face commit and every file is checked against `pod/qwen38-heretic-ara-w4a16.sha256`. vLLM's Python dependencies come from PyPI and PyTorch's index over TLS, not hash-pinned |
+| Downloads on the pod | `pod/bootstrap.sh`, `pod/install_vllm.sh`, `pod/gateway/run.sh` | uv 0.12.19, the vLLM 0.30.0 wheel and Caddy 2.10.2 are pinned and checked against published SHA-256 / SHA-512 before use. Each model is pinned to one Hugging Face commit and every file is checked against `pod/models/<model>.sha256`. vLLM's Python dependencies come from PyPI and PyTorch's index over TLS, not hash-pinned |
 
 ## Where the secrets live
 

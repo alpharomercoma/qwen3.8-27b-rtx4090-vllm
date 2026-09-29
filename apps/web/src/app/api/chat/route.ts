@@ -5,8 +5,8 @@ import {
   streamText,
   toUIMessageStream,
 } from "ai";
-import { MAX_OUTPUT_TOKENS, MODEL_ID } from "@/lib/config";
-import { inferenceProvider } from "@/lib/inference";
+import { MAX_OUTPUT_TOKENS } from "@/lib/config";
+import { forgetServedModel, inferenceProvider, servedModelId } from "@/lib/inference";
 import { isUnlocked } from "@/lib/session";
 import type { AnswerMetadata, ChatMessage, ChatRequestOptions } from "@/lib/types";
 
@@ -29,6 +29,10 @@ export async function POST(req: Request) {
   const system = typeof body?.system === "string" ? body.system.trim().slice(0, 8000) : "";
   const thinking = body?.thinking !== false;
 
+  const modelId = await servedModelId().catch(() => undefined);
+  if (!modelId) {
+    return Response.json({ error: "The model server is not reachable right now. It may be restarting." }, { status: 503 });
+  }
   const provider = await inferenceProvider();
   const started = performance.now();
   let firstTokenAt: number | undefined;
@@ -37,7 +41,7 @@ export async function POST(req: Request) {
   let reasoningEndAt: number | undefined;
 
   const result = streamText({
-    model: provider.chatModel(MODEL_ID),
+    model: provider.chatModel(modelId),
     system: system || undefined,
     // Earlier turns' reasoning is dropped by Qwen's chat template anyway; not sending it saves upload and tokens.
     messages: await convertToModelMessages(
@@ -92,6 +96,10 @@ function describeError(error: unknown): string {
     if (status === 401 || status === 403) return "The model server rejected this app's credentials.";
     if (status === 502 || status === 503 || status === 504) return "The model server is not reachable right now. It may be restarting.";
     if (status === 400) return `The model server refused the request: ${shortMessage(error.responseBody)}`;
+    if (status === 404) {
+      forgetServedModel();
+      return "The GPU server has just switched models. Send the message again.";
+    }
     if (status) return `The model server answered with HTTP ${status}.`;
   }
   const message = error instanceof Error ? error.message : String(error);

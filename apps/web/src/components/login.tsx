@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 import { unlock, type UnlockState } from "@/app/actions";
-import { MODEL_NAME } from "@/lib/config";
 import { Mark } from "./mark";
 
 export function Login() {
@@ -14,7 +13,7 @@ export function Login() {
           <Mark size={36} />
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Heretic</h1>
-            <p className="text-sm text-muted">{MODEL_NAME} on the team&apos;s RTX 4090</p>
+            <p className="text-sm text-muted">Qwen3.8-27B on the team&apos;s RTX 4090</p>
           </div>
         </div>
         <label htmlFor="password" className="mt-10 block text-sm font-medium">

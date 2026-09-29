@@ -1,22 +1,25 @@
 #!/bin/bash
-# POD. Download the served checkpoint: the official Heretic (ARA) abliteration of Qwen3.8-27B
-# (heretic-org/Qwen3.8-27B-heretic-ara, byte-identical to trohrbaugh/Qwen3.8-27B-heretic-ara), quantized to W4A16 with
-# AutoRound (1000 iterations, group 128; MTP head, vision tower, norms and conv1d kept in 16 bit). 18.2 GiB.
-# The default is pinned to one commit and every file is checked against qwen38-heretic-ara-w4a16.sha256, so the
-# served weights cannot change underneath us. usage: bash fetch_model.sh [repo] [dir]   (another repo: REV=<commit>)
+# POD. Download one of the models in models.sh at its pinned commit and check every file against
+# models/<model>.sha256, so the served weights cannot change underneath us.
+# usage: bash fetch_model.sh heretic|original
 set -euo pipefail
 . /workspace/env.sh
-DEFAULT_REPO=JC1DA/Qwen3.8-27B-heretic-ara-W4A16
-REPO=${1:-$DEFAULT_REPO}
-DIR=${2:-/workspace/models/qwen38-heretic-ara-w4a16}
-if [ "$REPO" = "$DEFAULT_REPO" ]; then REV=${REV:-0a191462511776109c129dda0772d33ae9b85be9}; else REV=${REV:?pin a commit: REV=<sha>}; fi
-rm -f "$DIR/.download-complete"
-hf download "$REPO" --revision "$REV" --local-dir "$DIR" --max-workers 8
-if [ "$REPO" = "$DEFAULT_REPO" ]; then
-  echo "checking SHA-256 of every file (about a minute)"
-  ( cd "$DIR" && grep -v '^#' "$(dirname "$0")/qwen38-heretic-ara-w4a16.sha256" | sha256sum -c --quiet - ) ||
-    { echo "checksum mismatch: not marking the download complete"; exit 1; }
+. /workspace/4090/pod/models.sh
+model_preset "${1:?usage: fetch_model.sh heretic|original}"
+# ~19 GB per model. Stop early with advice instead of filling the volume halfway through.
+have=0   # GB already downloaded (a resumed download needs less)
+if [ -d "$MODEL_DIR" ]; then have=$(du -s --block-size=1G "$MODEL_DIR" | cut -f1); fi
+free=$(df --output=avail --block-size=1G /workspace | tail -1 | tr -dc 0-9)
+if [ $((free + have)) -lt 21 ]; then
+  echo "not enough space on /workspace: ${free} GB free, a model needs ~20 GB. Free some first, e.g. the model you are"
+  echo "not using (rm -rf /workspace/models/<dir>) or uv's cache (uv cache clean). ls /workspace/models; df -h /workspace"
+  exit 1
 fi
-touch "$DIR/.download-complete"   # start.sh skips the download only when this exists
-( cd "$DIR" && du -sh . && ls )
+rm -f "$MODEL_DIR/.download-complete"
+hf download "$MODEL_REPO" --revision "$MODEL_REV" --local-dir "$MODEL_DIR" --max-workers 8
+echo "checking SHA-256 of every file (about a minute)"
+( cd "$MODEL_DIR" && grep -v '^#' "$MODEL_MANIFEST" | sha256sum -c --quiet - ) ||
+  { echo "checksum mismatch: not marking the download complete"; exit 1; }
+touch "$MODEL_DIR/.download-complete"   # start.sh skips the download only when this exists
+( cd "$MODEL_DIR" && du -sh . && ls )
 echo FETCH_DONE

@@ -1,6 +1,6 @@
 # SHA-256 of every file in JC1DA/Qwen3.8-27B-heretic-ara-W4A16 at commit 0a191462511776109c129dda0772d33ae9b85be9 (2026-08-17).
 # Large files: Hugging Face's LFS sha256. Small files: hashed after downloading them at that commit (2026-09-29).
-# pod/fetch_model.sh downloads exactly this commit and checks every file with sha256sum -c before it marks the download complete.
+# pod/fetch_model.sh heretic downloads exactly this commit and checks every file with sha256sum -c before it marks the download complete.
 34448b82c17d60fec9b65b1f093c115ddbaadc04beb1b0140b6bfed2e012a930  .gitattributes
 c3cf9e34abf4f9e36c2d72165aa9c132d3e2a725b6c2586aaa3a8af9d7a81041  chat_template.jinja
 aa9831e4d802dc86707d7fbe855192c4a3a81f0b7b2636893b08d5a1bc078b7c  config.json

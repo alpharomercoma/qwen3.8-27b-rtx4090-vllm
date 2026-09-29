@@ -11,10 +11,10 @@ import {
   titleFor,
   type StoredChat,
 } from "@/lib/chat-store";
-import { MODEL_NAME } from "@/lib/config";
 import type { ChatMessage, ChatRequestOptions } from "@/lib/types";
 import { Conversation } from "./conversation";
 import { Sidebar } from "./sidebar";
+import { ServerStatusProvider, useServedModel } from "./server-status";
 import { StatusPill } from "./status-pill";
 
 export function ChatApp() {
@@ -82,6 +82,7 @@ export function ChatApp() {
   const active = chats.find((c) => c.id === chatId);
 
   return (
+    <ServerStatusProvider>
     <div className="flex h-dvh overflow-hidden bg-paper">
       <Sidebar
         chats={chats}
@@ -104,7 +105,7 @@ export function ChatApp() {
           >
             <Menu size={20} />
           </button>
-          <h1 className="truncate text-[15px] font-medium">{active?.title ?? MODEL_NAME}</h1>
+          <h1 className="truncate text-[15px] font-medium">{active?.title ?? <ModelName />}</h1>
           <div className="ml-auto">
             <StatusPill />
           </div>
@@ -119,5 +120,10 @@ export function ChatApp() {
         />
       </main>
     </div>
+    </ServerStatusProvider>
   );
+}
+
+function ModelName() {
+  return <>{useServedModel()?.name ?? "Qwen3.8-27B"}</>;
 }

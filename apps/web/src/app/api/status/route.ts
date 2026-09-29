@@ -1,29 +1,29 @@
-import { MODEL_ID } from "@/lib/config";
-import { inferenceBaseUrl, inferenceHeaders } from "@/lib/inference";
+import { describeModel, type ServedModel } from "@/lib/config";
+import { fetchModels } from "@/lib/inference";
 import { isUnlocked } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
-export type ServerStatus = { state: "online" | "offline" | "unauthorized"; latencyMs?: number };
+export type ServerStatus = {
+  state: "online" | "offline" | "unauthorized";
+  latencyMs?: number;
+  /** The model the pod serves right now. */
+  model?: ServedModel;
+};
 
-/** Round trip to the GPU pod through the same path chat requests take. */
+/** Round trip to the GPU pod through the same path chat requests take, and which model it serves. */
 export async function GET() {
   if (!(await isUnlocked())) return Response.json({ error: "Enter the password first." }, { status: 401 });
   const started = performance.now();
   let status: ServerStatus;
   try {
-    const res = await fetch(`${inferenceBaseUrl()}/models`, {
-      headers: await inferenceHeaders(),
-      signal: AbortSignal.timeout(6000),
-      cache: "no-store",
-    });
+    const { status: code, ids } = await fetchModels();
     const latencyMs = Math.round(performance.now() - started);
-    if (res.status === 401 || res.status === 403) status = { state: "unauthorized", latencyMs };
-    else if (!res.ok) status = { state: "offline", latencyMs };
-    else {
-      const models = (await res.json()) as { data?: { id: string }[] };
-      status = { state: models.data?.some((m) => m.id === MODEL_ID) ? "online" : "offline", latencyMs };
-    }
+    const pinned = process.env.INFERENCE_MODEL;
+    const id = pinned ? ids.find((m) => m === pinned) : ids[0];
+    if (code === 401 || code === 403) status = { state: "unauthorized", latencyMs };
+    else if (!id) status = { state: "offline", latencyMs };
+    else status = { state: "online", latencyMs, model: describeModel(id) };
   } catch {
     status = { state: "offline" };
   }

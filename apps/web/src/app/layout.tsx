@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
-import { MODEL_NAME } from "@/lib/config";
 import "./globals.css";
 
 const plexSans = IBM_Plex_Sans({ variable: "--font-plex-sans", subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -8,7 +7,7 @@ const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"
 
 export const metadata: Metadata = {
   title: "Heretic",
-  description: `Team chat with ${MODEL_NAME}, served by vLLM on our own RTX 4090.`,
+  description: "Team chat with Qwen3.8-27B (Heretic or the original), served by vLLM on our own RTX 4090.",
   robots: { index: false, follow: false },
 };
 

@@ -27,22 +27,33 @@ sysctl -q -p /etc/sysctl.d/60-heretic-tunnel.conf
 echo "== caddy"
 install -d -m 755 /etc/caddy/apps.d
 install -m 644 "$SRC/heretic-inference.caddy" /etc/caddy/apps.d/heretic-inference.caddy
-# The PengePassportPH template (deploy/caddy/Caddyfile.template) carries this import line; add it to a Caddyfile
-# rendered before that change, right after the site's header block.
-if ! grep -q 'import /etc/caddy/apps.d/\*.caddy' /etc/caddy/Caddyfile; then
-  cp /etc/caddy/Caddyfile "/etc/caddy/Caddyfile.before-heretic.$(date +%s)"
-  python3 - <<'PY'
-import re
-p = "/etc/caddy/Caddyfile"
-s = open(p).read()
-marker = "\t# The app lives under its own path; other paths on this host stay free.\n"
-if marker not in s:
-    raise SystemExit("could not find where to add the import line; add 'import /etc/caddy/apps.d/*.caddy' by hand")
-s = s.replace(marker, "\t# Other apps on this host (one file each, e.g. /heretic-inference from ~/4090/edge).\n"
-              "\timport /etc/caddy/apps.d/*.caddy\n\n" + marker, 1)
-open(p, "w").write(s)
+# /etc/caddy/Caddyfile belongs to the server's other project, which may regenerate it. Make sure the import line is
+# inside the alphaexperiments.com site block itself (an import elsewhere would not add our routes to this site), as
+# its first line; rerun this script after such a regeneration.
+SITE=${EDGE_SITE:-alphaexperiments.com}
+python3 - "$SITE" /etc/caddy/Caddyfile <<'PY'
+import re, shutil, sys, time
+site, path = sys.argv[1], sys.argv[2]
+s = open(path).read()
+m = re.search(r"(?m)^" + re.escape(site) + r"\s*\{[ \t]*\n", s)
+if not m:
+    raise SystemExit(f"no '{site} {{' block in {path}: add 'import /etc/caddy/apps.d/*.caddy' inside it by hand")
+depth, end = 1, None  # find the block's closing brace ({placeholders} are balanced, so plain counting works)
+for i in range(m.end(), len(s)):
+    depth += {"{": 1, "}": -1}.get(s[i], 0)
+    if depth == 0:
+        end = i
+        break
+if end is None:
+    raise SystemExit(f"unbalanced braces after '{site} {{' in {path}")
+if re.search(r"(?m)^\s*import /etc/caddy/apps\.d/\*\.caddy\s*$", s[m.end():end]):
+    sys.exit(0)
+shutil.copy(path, f"{path}.before-heretic.{int(time.time())}")
+s = s[:m.end()] + "\t# Other apps on this host, one file each (/heretic-inference: ~/4090/edge/install.sh).\n" \
+    "\timport /etc/caddy/apps.d/*.caddy\n\n" + s[m.end():]
+open(path, "w").write(s)
+print(f"added the import line to the {site} block")
 PY
-fi
 caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile >/dev/null 2>&1 || { caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile; exit 1; }
 systemctl reload caddy
 echo "installed"

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { MODELS } from "../src/lib/config";
 
 const PASSWORD = process.env.E2E_PASSWORD ?? "";
 test.beforeAll(() => {
@@ -48,9 +49,15 @@ test("a wrong password is refused, the right one unlocks", async ({ page }) => {
   expect(cookie?.path).toBe("/heretic-inference");
 });
 
-test("the GPU server shows as online", async ({ page }) => {
+test("the GPU server shows as online, with the model it serves", async ({ page }) => {
   await unlock(page);
-  await expect(page.getByRole("status").filter({ hasText: "Online" })).toBeVisible();
+  const pill = page.getByRole("status").filter({ hasText: "Online" });
+  await expect(pill).toBeVisible();
+  const served = (await pill.getAttribute("title"))?.match(/serving (\S+?),/)?.[1];
+  expect(Object.keys(MODELS)).toContain(served);
+  // the welcome screen and the composer name that model
+  await expect(page.locator("main h2").first()).toHaveText(MODELS[served!].name);
+  await expect(composer(page)).toHaveAttribute("placeholder", `Message ${MODELS[served!].name}`);
 });
 
 test("an answer streams with reasoning, telemetry, and is saved", async ({ page }) => {
@@ -104,10 +111,17 @@ test("a multi-turn conversation keeps context", async ({ page }) => {
 
 test("the terminal dialog shows the API URL and model, never a key", async ({ page }) => {
   await unlock(page);
+  const pill = page.getByRole("status").filter({ hasText: "Online" });
+  await expect(pill).toBeVisible();
+  const served = (await pill.getAttribute("title"))?.match(/serving (\S+?),/)?.[1];
   await page.getByRole("button", { name: "Use from the terminal" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toContainText("https://alphaexperiments.com/heretic-inference/v1");
-  await expect(dialog).toContainText("qwen3.8-27b-heretic");
+  // "Serving now" and the ready-to-run commands name the live model
+  await expect(dialog).toContainText(`${MODELS[served!].name} (${served})`);
+  await expect(dialog).toContainText(`pi --model heretic/${served}`);
+  await expect(dialog).toContainText(`opencode run -m heretic/${served} "hello"`);
+  await expect(dialog).toContainText(`"model": "${served}"`);
   await expect(dialog).toContainText("$HERETIC_API_KEY");
   const text = await dialog.innerText();
   expect(text).not.toMatch(/sk-heretic-(?!PASTE)[A-Za-z0-9_-]{20,}/);

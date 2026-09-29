@@ -11,9 +11,10 @@ type Props = {
   onThinkingChange: (on: boolean) => void;
   system: string;
   onSystemChange: (text: string) => void;
+  placeholder: string;
 };
 
-export function Composer({ onSend, onStop, busy, thinking, onThinkingChange, system, onSystemChange }: Props) {
+export function Composer({ onSend, onStop, busy, thinking, onThinkingChange, system, onSystemChange, placeholder }: Props) {
   const [text, setText] = useState("");
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -88,7 +89,7 @@ export function Composer({ onSend, onStop, busy, thinking, onThinkingChange, sys
             }
           }}
           rows={1}
-          placeholder="Message Heretic"
+          placeholder={placeholder}
           aria-label="Message"
           className="block max-h-[40vh] w-full resize-none bg-transparent px-4 pt-3.5 pb-1 text-base outline-none focus-visible:outline-none placeholder:text-muted/80"
         />

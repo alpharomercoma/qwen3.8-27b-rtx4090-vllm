@@ -26,3 +26,16 @@ edge's single IP, so a limiter would be global and could lock the team out).
 
 The review never touched production. Things only a running pod can prove (a fresh-pod install, the GPU-dependent
 Playwright tests) were verified earlier in the session or are marked as not yet run in the Resolution tables.
+
+## Second change: two models, no dependency on the other project (2026-09-29)
+
+Adds the original model (`RedHatAI/Qwen3.8-27B-INT4`) next to Heretic, one served at a time; the web app discovers
+which; the edge installer no longer relies on the other project's Caddyfile template.
+
+| Round | New findings | Most important | Verdict |
+|---|---|---|---|
+| [1](2026-09-29_codex_terra_switch_round1.md) | 5 (1 high) | Import-line check matched any site block, not the `alphaexperiments.com` one | Needs fixes |
+| [2](2026-09-29_codex_terra_switch_round2.md) | 1 (high) | `du` on a missing directory aborted the first model download under `set -e` | Needs fixes |
+| [3](2026-09-29_codex_terra_switch_round3.md) | 2 | The terminal dialog showed the last-known model during a restart | Needs fixes |
+| [4](2026-09-29_codex_terra_switch_round4.md) | 2 (low) | Two doc precision points | Needs fixes |
+| [5](2026-09-29_codex_terra_switch_round5.md) | 0 | | **PASS** |

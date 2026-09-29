@@ -4,11 +4,12 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { ArrowDown, CircleAlert } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BASE_PATH, MODEL_NAME } from "@/lib/config";
+import { BASE_PATH } from "@/lib/config";
 import type { ChatMessage, ChatRequestOptions } from "@/lib/types";
 import { Composer } from "./composer";
 import { Mark } from "./mark";
 import { AssistantMessage, UserMessage } from "./message";
+import { useServedModel } from "./server-status";
 
 // Stateless, so one instance serves every chat. Settings travel with each request (see `options`).
 const transport = new DefaultChatTransport<ChatMessage>({ api: `${BASE_PATH}/api/chat` });
@@ -30,6 +31,7 @@ export function Conversation({ chatId, initialMessages, settings, onSettingsChan
   });
 
   const busy = status === "submitted" || status === "streaming";
+  const model = useServedModel();
   const options = { body: { thinking: settings.thinking, system: settings.system } satisfies ChatRequestOptions };
 
   // Save when the conversation changed and settled, and once more if the chat is left mid-answer. Opening a chat
@@ -87,6 +89,7 @@ export function Conversation({ chatId, initialMessages, settings, onSettingsChan
       onThinkingChange={(thinking) => onSettingsChange({ ...settings, thinking })}
       system={settings.system}
       onSystemChange={(system) => onSettingsChange({ ...settings, system })}
+      placeholder={model ? `Message ${model.name}` : "Message"}
     />
   );
 
@@ -96,9 +99,10 @@ export function Conversation({ chatId, initialMessages, settings, onSettingsChan
         <div className="w-full max-w-[46rem]">
           <div className="mb-8 flex flex-col items-center text-center">
             <Mark size={44} />
-            <h2 className="mt-4 text-2xl font-semibold tracking-tight">{MODEL_NAME}</h2>
+            <h2 className="mt-4 text-2xl font-semibold tracking-tight">{model?.name ?? "Qwen3.8-27B"}</h2>
             <p className="mt-2 max-w-md text-[15px] text-muted">
-              An uncensored Qwen3.8-27B running on the team&apos;s own RTX 4090. Chats are saved in this browser only.
+              {model?.description ? `${model.description} ` : ""}Runs on the team&apos;s own RTX 4090. Chats are saved in
+              this browser only.
             </p>
           </div>
           {composer}

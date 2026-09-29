@@ -12,6 +12,7 @@ KEY=$(cat /workspace/.api_key)
 case "$CFG" in
   lcpp-*)   ENGINE=llamacpp; URL=http://127.0.0.1:8080/v1; API=openai; HEALTH=http://127.0.0.1:8080/health ;;
   heretic*) ENGINE=vllm;     URL=http://127.0.0.1:8000/v1; API=openai; HEALTH=http://127.0.0.1:8000/health; MODEL=${MODEL:-qwen3.8-27b-heretic} ;;
+  original) ENGINE=vllm;     URL=http://127.0.0.1:8000/v1; API=openai; HEALTH=http://127.0.0.1:8000/health ;;
   vllm-*)   ENGINE=vllm;     URL=http://127.0.0.1:8000/v1; API=openai; HEALTH=http://127.0.0.1:8000/health ;;
   sglang-*) ENGINE=sglang;   URL=http://127.0.0.1:8000/v1; API=openai; HEALTH=http://127.0.0.1:8000/health ;;
   ollama-*) ENGINE=ollama;   URL=http://127.0.0.1:11434;   API=ollama; HEALTH=http://127.0.0.1:11434/api/version ;;

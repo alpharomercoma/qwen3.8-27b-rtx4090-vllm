@@ -1,6 +1,7 @@
 #!/bin/bash
 # POD. Start one serving configuration in tmux session "serve" (any previous one is stopped first).
 # usage: bash /workspace/4090/pod/serve.sh <config>        list: bash serve.sh list
+# Production configs: heretic, original (the models in models.sh). The rest are benchmark configs (docs/benchmarks).
 # Every engine listens on 127.0.0.1 only; the Mac reaches it through scripts/tunnel.sh.
 # Ports: llama.cpp 8080, vLLM / SGLang 8000, Ollama 11434. Bearer key: /workspace/.api_key (Ollama has none).
 set -euo pipefail
@@ -24,8 +25,12 @@ VLLM_FLAGS="--host 127.0.0.1 --port 8000 --api-key $KEY --language-model-only --
       --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder
       --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}'"
 VLLM="$VLLM_SERVE /workspace/models/qwen38-redhat-int4 --served-model-name $NAME $VLLM_FLAGS"
-# Production model: the official Heretic (ARA) abliteration of Qwen3.8-27B, AutoRound W4A16 (pod/fetch_model.sh)
-HERETIC="$VLLM_SERVE /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic $VLLM_FLAGS"
+# Production: whichever model in models.sh, with the measured team settings of vllm-int4-kv4-pin (int4 KV on Triton
+# attention, 4.5 GiB KV pool pinned = 246,094 tokens, 64k per request, 16 running, prefix caching)
+. /workspace/4090/pod/models.sh
+PROD_FLAGS="--max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align
+            --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN"
+prod() { model_preset "$1" && echo "$VLLM_SERVE $MODEL_DIR --served-model-name $MODEL_ID $VLLM_FLAGS $PROD_FLAGS"; }
 
 # SGLang 0.5.19 (last CUDA 12 build) on the same INT4 checkpoint as vLLM. bf16 GDN state halves it; the state pool
 # (--language-model-only exists in 0.5.19 but only for MuseGlimmer: the Qwen3.8 vision tower stays loaded, +1 GB vs vLLM)
@@ -52,13 +57,11 @@ SGL_OSS="env PATH=/root/venvs/sglang/bin:/usr/local/cuda-12.8/bin:$PATH CUDA_HOM
 
 case "$CFG" in
   list) grep -E '^  [a-z0-9_-]+\)' "$0" | sed 's/).*//'; exit 0 ;;
-  # ---- PRODUCTION (web app + pi/opencode through pod/gateway): the measured team settings of vllm-int4-kv4-pin
-  #      (int4 KV on Triton attention, 4.5 GiB KV pool pinned, 64k per request, 16 running, prefix caching)
-  heretic) CMD="$HERETIC --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align
-              --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208" ;;
+  # ---- PRODUCTION (web app + pi/opencode through pod/gateway); start.sh picks one
+  heretic)  CMD="$(prod heretic) --kv-cache-memory-bytes 4831838208" ;;
+  original) CMD="$(prod original) --kv-cache-memory-bytes 4831838208" ;;
   # candidate: 1 GiB more KV (~300k tokens) for heavy multi-agent load; see docs/ARCHITECTURE.md for the stress run
-  heretic-kv55) CMD="$HERETIC --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align
-              --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 5905580032" ;;
+  heretic-kv55) CMD="$(prod heretic) --kv-cache-memory-bytes 5905580032" ;;
   # ---- llama.cpp: quant ladder at the same 64k shared pool (--kv-unified: one pool for all slots; a long session can
   #      use what idle slots are not using, but when the sum of live contexts overflows the pool, requests FAIL)
   lcpp-q4kxl)   CMD="$LCPP -m $G/Qwen3.8-27B-UD-Q4_K_XL.gguf -c 65536 -np 8 --kv-unified -ctk q8_0 -ctv q8_0" ;;
