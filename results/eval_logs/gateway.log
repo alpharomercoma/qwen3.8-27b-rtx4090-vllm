@@ -1,0 +1,15 @@
+{"level":"info","ts":1791107553.6273487,"msg":"maxprocs: Updating GOMAXPROCS=10: determined from CPU quota"}
+{"level":"info","ts":1791107553.6284068,"msg":"GOMEMLIMIT is updated","package":"github.com/KimMachineGun/automemlimit/memlimit","GOMEMLIMIT":27899998617,"previous":9223372036854775807}
+{"level":"info","ts":1791107553.6285217,"msg":"using config from file","file":"/workspace/4090/pod/gateway/Caddyfile"}
+{"level":"info","ts":1791107553.6300437,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1791107553.6305957,"logger":"admin","msg":"admin endpoint disabled"}
+{"level":"info","ts":1791107553.6308796,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0xc000664000"}
+{"level":"info","ts":1791107553.630907,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+{"level":"warn","ts":1791107553.6325078,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":"127.0.0.1:8443"}
+{"level":"warn","ts":1791107553.6325333,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":"127.0.0.1:8443"}
+{"level":"info","ts":1791107553.6325424,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1791107553.6329238,"msg":"autosaved config (load with --resume flag)","file":"/root/.config/caddy/autosave.json"}
+{"level":"info","ts":1791107553.6329637,"msg":"serving initial configuration"}
+{"level":"info","ts":1791107553.6340282,"logger":"tls","msg":"storage cleaning happened too recently; skipping for now","storage":"FileStorage:/root/.local/share/caddy","instance":"981e3e1d-0f46-46bc-bce9-09e5a008a3bb","try_again":1791193953.6340246,"try_again_in":86399.99999933}
+{"level":"info","ts":1791107553.6341493,"logger":"tls","msg":"finished cleaning storage units"}
+{"level":"info","ts":1791114366.164542,"msg":"not implemented","signal":"SIGHUP"}

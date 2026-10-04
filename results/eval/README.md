@@ -16,5 +16,6 @@ Written by [`bench/evals/evalsuite.py`](../../bench/evals/evalsuite.py) on 2026-
 | `judge_prompts/A/`, `judge_prompts/B/` | The same answers judged with the two earlier judge prompts (docs/EVAL.md → "The judge's prompt matters"); the headline verdicts in `<model>/` use JailbreakBench's prompt |
 | `<model>/timing.jsonl` | Wall time per task run (a `0 items` line is a resumed run with nothing left to do). This run's rows predate the `max_tokens` field; the caps are in `manifest.json`. Answer rows written from now on also carry `prompt_sha256` and `max_tokens`, so a resumed run cannot mix answers to other prompts or caps; this run's rows predate them and were scored with `--legacy-rows` |
 
-`<model>` is `qwen3.8-27b` (the original) or `qwen3.8-27b-heretic`. Prompts are rebuilt from the datasets by
-`evalsuite.py prepare`; item ids match across both models.
+`<model>` is `qwen3.8-27b` (the original) or `qwen3.8-27b-heretic`. The prompts and gold answers as scored are in
+[`../eval_data/`](../eval_data/README.md) (also rebuilt by `evalsuite.py prepare`); item ids match across both
+models. The run's logs are in [`../eval_logs/`](../eval_logs/README.md).

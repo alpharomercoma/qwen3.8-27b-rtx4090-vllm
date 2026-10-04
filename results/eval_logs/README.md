@@ -15,5 +15,8 @@ Copied from the pod before it was deleted. The numbers are in [`../eval/`](../ev
 | `bootstrap.log`, `bootstrap_apt.log` | Pod setup |
 | `run_metadata_before_rescore.json` | `run_metadata.json` as the run wrote it, before the answers were scored again on a second pod (its content is also kept inside today's `run_metadata.json`) |
 
-Left out: the gateway and tunnel logs (not part of the evaluation), and the answers to JailbreakBench's harmful
-requests, which by design never left the pod and were deleted with it.
+| `gateway.log`, `gateway_access.log`, `authz.log` | The pod's API gateway (Caddy and the key/token check), started by `start.sh`; no request reached it (the access log is empty) |
+| `edge_tunnel.log` | The tunnel to alphaexperiments.com retrying every 5 s all day: first refused for the key (this pod's key was never installed on the edge), later refused at the TCP level |
+
+Not here: the answers to JailbreakBench's harmful requests, which by design never left the pod and were deleted
+with it, and the model weights. The prompts and gold answers are in [`../eval_data/`](../eval_data/README.md).
