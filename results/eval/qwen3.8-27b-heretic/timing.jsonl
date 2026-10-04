@@ -1,0 +1,8 @@
+{"task": "gsm8k", "items": 1319, "wall_s": 810.8, "concurrency": 16, "ts": "2026-10-04T07:39:21Z"}
+{"task": "gsm8k", "items": 0, "wall_s": 0.0, "concurrency": 16, "ts": "2026-10-04T07:42:09Z"}
+{"task": "mmlu_pro", "items": 1400, "wall_s": 2706.5, "concurrency": 16, "ts": "2026-10-04T08:27:16Z"}
+{"task": "ifeval", "items": 541, "wall_s": 308.4, "concurrency": 16, "ts": "2026-10-04T08:32:24Z"}
+{"task": "humaneval", "items": 164, "wall_s": 86.7, "concurrency": 16, "ts": "2026-10-04T08:33:51Z"}
+{"task": "jbb_harmful", "items": 100, "wall_s": 41.5, "concurrency": 16, "ts": "2026-10-04T08:34:32Z"}
+{"task": "jbb_benign", "items": 100, "wall_s": 42.0, "concurrency": 16, "ts": "2026-10-04T08:35:14Z"}
+{"task": "harmless", "items": 200, "wall_s": 3.2, "concurrency": 16, "ts": "2026-10-04T08:35:17Z"}

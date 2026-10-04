@@ -18,7 +18,10 @@ serving() { curl -sf -H "Authorization: Bearer $(cat /workspace/.api_key)" http:
 
 # bootstrap.sh provides all of these; run it unless every one is present
 export PATH=/root/.local/bin:$PATH
-if ! command -v tmux jq uv hf >/dev/null || [ ! -x /usr/local/cuda-12.8/bin/nvcc ] || [ ! -s /workspace/.api_key ]; then
+C=/usr/local/cuda-12.8   # the same CUDA checks as bootstrap.sh
+missing=0; for tool in tmux jq uv hf setpriv pkill; do command -v "$tool" >/dev/null || missing=1; done
+if [ $missing = 1 ] || [ ! -x $C/bin/nvcc ] || [ ! -f $C/include/cublas_v2.h ] ||
+   [ ! -f $C/include/curand.h ] || [ ! -f $C/include/nvrtc.h ] || [ ! -s /workspace/.api_key ]; then
   bash $P/bootstrap.sh > /workspace/logs/bootstrap.log 2>&1 || fail "bootstrap failed: /workspace/logs/bootstrap.log"
 fi
 cp $P/env.sh /workspace/env.sh   # always the version that came with this code

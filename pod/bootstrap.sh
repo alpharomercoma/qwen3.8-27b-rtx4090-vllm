@@ -7,8 +7,15 @@ cp /workspace/4090/pod/env.sh /workspace/env.sh
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 # tmux/jq: job control; zstd: Ollama installer; CUDA 12.8 compiler + headers: FlashInfer JIT in the cu129 vLLM needs nvcc >= 12.8
-apt-get install -y -qq tmux jq zstd cmake cuda-nvcc-12-8 cuda-cudart-dev-12-8 cuda-cccl-12-8 cuda-nvrtc-dev-12-8 \
-  libcublas-dev-12-8 libcurand-dev-12-8 > /workspace/logs/bootstrap_apt.log 2>&1
+# procps/util-linux: pkill and setpriv, which the benchmark sandbox needs (bench/evals/evalsuite.py)
+apt-get install -y -qq tmux jq zstd cmake procps util-linux > /workspace/logs/bootstrap_apt.log 2>&1
+for tool in setpriv pkill; do command -v "$tool" >/dev/null || { echo "bootstrap: $tool is missing"; exit 1; }; done
+# Images built on a CUDA 12.8 devel base already have all of this (and pin versions apt cannot upgrade around)
+C=/usr/local/cuda-12.8
+if [ ! -x $C/bin/nvcc ] || [ ! -f $C/include/cublas_v2.h ] || [ ! -f $C/include/curand.h ] || [ ! -f $C/include/nvrtc.h ]; then
+  apt-get install -y -qq cuda-nvcc-12-8 cuda-cudart-dev-12-8 cuda-cccl-12-8 cuda-nvrtc-dev-12-8 \
+    libcublas-dev-12-8 libcurand-dev-12-8 >> /workspace/logs/bootstrap_apt.log 2>&1
+fi
 # uv: a pinned release, checked against the SHA-256 GitHub lists for it, instead of piping an installer into sh
 UV_VERSION=0.12.19
 UV_SHA256=23bf5552d220e0842b65c862097b2ebaeba0064b74eda5e565e77fd25969d8c8
@@ -22,6 +29,10 @@ fi
 . /workspace/env.sh
 command -v hf >/dev/null || uv tool install -q "huggingface_hub[hf_xet]"
 [ -f /workspace/.api_key ] || { python3 -c "import secrets;print('sk-4090-'+secrets.token_hex(20))" > /workspace/.api_key; chmod 600 /workspace/.api_key; }
+# every key file root-only, also ones that already existed (a volume can come from elsewhere)
+for f in /workspace/.api_key /workspace/.team_api_keys; do [ -e "$f" ] && chown root:root "$f" && chmod 600 "$f"; done
+[ -d /workspace/.secrets ] && chown -R root:root /workspace/.secrets && chmod -R go-rwx /workspace/.secrets
+[ "$(stat -c '%u %a' /workspace/.api_key)" = "0 600" ] || { echo "/workspace/.api_key is not root-only"; exit 1; }
 nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
 # everything start.sh relies on, or stop here with a clear failure
 for tool in tmux jq uv hf; do command -v "$tool" >/dev/null || { echo "bootstrap: $tool is missing"; exit 1; }; done

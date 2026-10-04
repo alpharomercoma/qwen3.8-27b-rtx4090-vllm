@@ -20,7 +20,9 @@ LCPP="llama-server --alias $NAME --host 127.0.0.1 --port 8080 --api-key $KEY -ng
 # vLLM on 24 GB: drop the vision tower, fp8 KV, fp16 Gated DeltaNet state (halves 147 MiB per sequence),
 # 2048-token prefill chunks so decode streams keep flowing while another user's prompt is prefilled.
 VLLM_SERVE="env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:$PATH CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve"
-VLLM_FLAGS="--host 127.0.0.1 --port 8000 --api-key $KEY --language-model-only --gpu-memory-utilization 0.95
+# vLLM reads its key from VLLM_API_KEY (set at launch below), not --api-key: any local user can read a process's
+# command line in /proc, but only its owner can read its environment.
+VLLM_FLAGS="--host 127.0.0.1 --port 8000 --language-model-only --gpu-memory-utilization 0.95
       --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048
       --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder
       --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}'"
@@ -46,7 +48,7 @@ SGL="env PATH=/root/venvs/sglang/bin:/usr/local/cuda-12.8/bin:$PATH CUDA_HOME=/u
 OSS=/workspace/models/gpt-oss-20b
 OSS_GGUF=/workspace/models/gpt-oss-20b-gguf/gpt-oss-20b-MXFP4.gguf  # ggml-org GGUF; Ollama's names the arch "gptoss", which llama.cpp rejects
 VLLM_OSS="env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:$PATH CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-      /workspace/venvs/vllm/bin/vllm serve $OSS --served-model-name gpt-oss-20b --host 127.0.0.1 --port 8000 --api-key $KEY
+      /workspace/venvs/vllm/bin/vllm serve $OSS --served-model-name gpt-oss-20b --host 127.0.0.1 --port 8000
       --max-model-len 65536 --max-num-seqs 16 --max-num-batched-tokens 2048 --enable-prefix-caching
       --reasoning-parser openai_gptoss --enable-auto-tool-choice --tool-call-parser openai --enable-prompt-tokens-details
       --compilation-config '{\"max_cudagraph_capture_size\":32}' --kv-cache-memory-bytes 6442450944"
@@ -143,5 +145,7 @@ killp "llama-server|vllm serve|ollama serve|sglang.launch_server"
 for _ in $(seq 60); do nvidia-smi --query-compute-apps=pid --format=csv,noheader | grep -q . || break; sleep 1; done
 CMD=$(echo $CMD)   # fold the multi-line flag blocks onto one line
 echo "$(date -u +%FT%TZ) $CFG: ${CMD//$KEY/<key>}" | tee -a /workspace/logs/serve_history.log
-tmux new-session -d -s serve "exec $CMD > $LOG 2>&1"
+# The key is read inside the session, so neither tmux's command line nor vLLM's holds it (llama.cpp and SGLang,
+# benchmark configs only, still take it as --api-key).
+tmux new-session -d -s serve "export VLLM_API_KEY=\$(cat /workspace/.api_key); exec $CMD > $LOG 2>&1"
 echo "started $CFG -> $LOG"

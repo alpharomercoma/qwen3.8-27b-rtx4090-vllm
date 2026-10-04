@@ -16,11 +16,12 @@ if ! /workspace/venvs/vllm/bin/python -c "import vllm, sys; sys.exit(vllm.__vers
   VIRTUAL_ENV=/workspace/venvs/vllm uv pip install --torch-backend=cu129 "$W"
 fi
 # uv takes torchcodec from PyPI, whose wheel is built for CUDA 13 (libnvrtc.so.13): vLLM then dies on import on a
-# CUDA 12.8 driver. Swap in PyTorch's cu129 build of the same version.
+# CUDA 12.8 driver. Swap in PyTorch's cu129 build. Pinned: 0.16.0 pairs with this torch, and newer torchcodec releases
+# (0.17.0 by 2026-10-04) have no cu129 build at all.
+TORCHCODEC=0.16.0+cu129
 if ! /workspace/venvs/vllm/bin/python -c "import torchcodec.decoders" 2>/dev/null; then
-  TC=$(/workspace/venvs/vllm/bin/python -c "import importlib.metadata as m; print(m.version('torchcodec').split('+')[0])")
   VIRTUAL_ENV=/workspace/venvs/vllm uv pip install --reinstall-package torchcodec \
-    --index-url https://download.pytorch.org/whl/cu129 "torchcodec==$TC+cu129"
+    --index-url https://download.pytorch.org/whl/cu129 "torchcodec==$TORCHCODEC"
 fi
 /workspace/venvs/vllm/bin/python -c "import torch, vllm; print('torch', torch.__version__, torch.version.cuda, torch.cuda.is_available(), torch.cuda.get_device_name(0)); print('vllm', vllm.__version__)"
 echo INSTALL_VLLM_DONE

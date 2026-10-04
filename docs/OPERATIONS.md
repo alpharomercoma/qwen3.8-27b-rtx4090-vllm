@@ -20,7 +20,7 @@ only restarts processes. A RunPod container start command can run it on boot:
 
 ## Switch model
 
-The pod serves one model at a time (`pod/models.sh`):
+The pod serves one model at a time (`pod/models.sh`). How they differ in quality and refusals: [EVAL.md](EVAL.md).
 
 | Name | Hugging Face checkpoint | Served as |
 |---|---|---|
@@ -109,4 +109,5 @@ The web app, the edge routes and the client configs do not change.
 | 404 `The model ... does not exist` | The client asks for the model that is not being served | Pick the live one ([Switch model](#switch-model)) |
 | vLLM dies on import: `libnvrtc.so.13` | A CUDA 13 `torchcodec` was installed | `bash /workspace/4090/pod/install_vllm.sh` swaps in the CUDA 12.9 build |
 | Everything in tmux vanished after a restart | An old script killed the tmux server with `pkill -f` (its command line contains the first session's command) | Fixed: the scripts use `killp` from `pod/env.sh`, which skips tmux. `start.sh` brings everything back |
+| `uv`: `Permission denied` under `/workspace/.cache/uv` | The volume came with a cache written by a user id this container does not map (shown as `nobody`); even root cannot write it | `mv /workspace/.cache/uv /workspace/.cache/uv.old` (or `export UV_CACHE_DIR=/tmp/uv`) and run the command again |
 | Empty `200` from the gateway | The gateway's site address had a host, so requests with another `Host` header matched nothing | Fixed in `pod/gateway/Caddyfile`: `http://:8443` + `bind 127.0.0.1` |

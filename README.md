@@ -8,6 +8,11 @@ served by vLLM on one rented RTX 4090. The GPU runs one of two builds at a time,
 | **Heretic** (default) | `qwen3.8-27b-heretic` | The official Heretic (ARA) abliteration ([`heretic-org/Qwen3.8-27B-heretic-ara`](https://huggingface.co/heretic-org/Qwen3.8-27B-heretic-ara)), 4-bit: answers requests the original refuses |
 | **Original** | `qwen3.8-27b` | Qwen3.8-27B as released ([`RedHatAI/Qwen3.8-27B-INT4`](https://huggingface.co/RedHatAI/Qwen3.8-27B-INT4)), the build the engine benchmarks used |
 
+How they compare on held-out benchmarks (same GPU, same vLLM settings): Heretic scores at most 1.4 points lower on
+MMLU-Pro, GSM8K, IFEval and HumanEval (no difference significant after correcting for multiple tests), and refuses
+23% of JailbreakBench's harmful requests instead of 96%, and 1% of its benign look-alikes instead of 24%. Details:
+[docs/EVAL.md](docs/EVAL.md).
+
 - **Chat:** https://alphaexperiments.com/heretic-inference (a ChatGPT-style app; ask the team for the password). It
   shows which model is live.
 - **API:** `https://alphaexperiments.com/heretic-inference/v1`, OpenAI-compatible, with a team API key. Works with pi,
@@ -55,10 +60,10 @@ Why vLLM, why this quant, and how it compares with Ollama, llama.cpp and SGLang 
 | [`apps/web/`](apps/web/README.md) | Vercel | Next.js 16 + AI SDK 7 chat app, Playwright tests in `e2e/` |
 | [`pod/`](pod/README.md) | GPU pod | `start.sh` (everything), `models.sh` (the two models), install, model download, `serve.sh` configs, `gateway/` (Caddy, `authz.py`, `keys.sh`, tunnel) |
 | [`edge/`](edge/README.md) | alphaexperiments.com | Caddy routes, the tunnel account's SSH rules, TCP tuning, `install.sh` |
-| `scripts/` | Mac | `pod_connect.sh` (find a pod, pin its host key), `pod.sh` / `push.sh` / `pull.sh` (pod over SSH), `edge.sh` (edge server), `verify_clients.sh` (pi + opencode test), `bench_public.sh` |
-| `bench/` | Mac or pod | Load generator, latency probes, pi team runs, right-sizing calculator, table generators |
-| `docs/` | | [ARCHITECTURE](docs/ARCHITECTURE.md), [DEPLOY](docs/DEPLOY.md) (step by step from scratch), [OPERATIONS](docs/OPERATIONS.md) (runbook), [SECURITY](docs/SECURITY.md), [CLIENTS](docs/CLIENTS.md), [benchmarks/](docs/benchmarks/README.md), [review/](docs/review/) |
-| `results/` | | Raw measurements behind every number in the docs (`raw/`, `evidence/`, `llamabench/`) |
+| `scripts/` | Mac | `pod_connect.sh` (find a pod, pin its host key), `pod.sh` / `push.sh` / `pull.sh` / `pull_eval.sh` (pod over SSH), `edge.sh` (edge server), `verify_clients.sh` (pi + opencode test), `bench_public.sh` |
+| `bench/` | Mac or pod | Load generator, latency probes, pi team runs, right-sizing calculator, table generators; `evals/` (quality benchmarks, [docs/EVAL.md](docs/EVAL.md)) |
+| `docs/` | | [ARCHITECTURE](docs/ARCHITECTURE.md), [DEPLOY](docs/DEPLOY.md) (step by step from scratch), [OPERATIONS](docs/OPERATIONS.md) (runbook), [SECURITY](docs/SECURITY.md), [CLIENTS](docs/CLIENTS.md), [EVAL](docs/EVAL.md) (Heretic vs original quality), [benchmarks/](docs/benchmarks/README.md), [review/](docs/review/) |
+| `results/` | | Raw measurements behind every number in the docs (`raw/`, `evidence/`, `llamabench/`, `eval/`) |
 | `models/configs/` | | `config.json` copies for `bench/fit.py` |
 
 ## Common tasks

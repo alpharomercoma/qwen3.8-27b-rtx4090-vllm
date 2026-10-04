@@ -12,8 +12,10 @@ out=$( { printf '%s\n' \
   'for f in /etc/ssh/ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ecdsa_key.pub; do [ -f $f ] && printf "@@KEY %s\n" "$(cut -d" " -f1,2 $f)"; done' \
   'exit'; } | ssh -tt -o ConnectTimeout=20 -o StrictHostKeyChecking=yes \
       -o UserKnownHostsFile="$HERE/scripts/runpod_known_hosts" -i ~/.ssh/id_ed25519 "$PROXY" 2>/dev/null | tr -d '\r' )
-addr=$(printf '%s\n' "$out" | grep -E '^@@ADDR [0-9.]+ [0-9]+$' | tail -1 | cut -d' ' -f2,3)
-keys=$(printf '%s\n' "$out" | grep -E '^@@KEY (ssh-ed25519|ecdsa-sha2-nistp256) [A-Za-z0-9+/=]+$' | cut -d' ' -f2,3)
+# the terminal puts escape sequences (e.g. ESC[?2004l) before output lines, so match the markers anywhere; the echoed
+# commands cannot match because they contain %s where the values go
+addr=$(printf '%s\n' "$out" | grep -oE '@@ADDR [0-9.]+ [0-9]+$' | tail -1 | cut -d' ' -f2,3)
+keys=$(printf '%s\n' "$out" | grep -oE '@@KEY (ssh-ed25519|ecdsa-sha2-nistp256) [A-Za-z0-9+/=]+$' | cut -d' ' -f2,3)
 [ -n "$addr" ] || { echo "no answer with the pod's address. Is the pod running with SSH over TCP exposed? If ssh reports a"
                     echo "changed host key for ssh.runpod.io, check RunPod's current key before updating scripts/runpod_known_hosts."; exit 1; }
 [ -n "$keys" ] || { echo "could not read the pod's SSH host keys"; exit 1; }

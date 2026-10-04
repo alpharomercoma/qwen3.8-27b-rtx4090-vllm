@@ -9,6 +9,7 @@ __pycache__/
 .pod_env
 .pod_env.*
 .pod_known_hosts
+.pod_known_hosts.*
 .secrets
 .secrets/
 .team_api_keys

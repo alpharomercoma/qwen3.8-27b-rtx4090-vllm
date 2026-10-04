@@ -75,6 +75,7 @@ Both are pinned to a Hugging Face commit and every file is checked against `pod/
 | Not used | MTP speculative decoding | In the study it sped up one user (82 vs 52 tok/s) but slowed agents |
 
 Why vLLM and not Ollama, llama.cpp or SGLang, and why this quant size: [benchmarks/REPORT.md](benchmarks/REPORT.md).
+How Heretic and the original compare in answer quality and refusals: [EVAL.md](EVAL.md).
 
 ## Performance
 

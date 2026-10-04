@@ -1,0 +1,66 @@
+{
+  "gsm8k": {
+    "repo": "openai/gsm8k",
+    "config": "main",
+    "split": "test",
+    "revision": "740312add88f781978c0658806c59bc2815b9866",
+    "rows_in_split": 1319,
+    "items": 1319,
+    "max_tokens": 1024
+  },
+  "mmlu_pro": {
+    "repo": "TIGER-Lab/MMLU-Pro",
+    "config": null,
+    "split": "test",
+    "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+    "rows_in_split": 12032,
+    "items": 1400,
+    "max_tokens": 4096,
+    "max_tokens_note": "prepare ran with 2048; raised to 4096 before either full MMLU-Pro run, so every MMLU-Pro answer of both models was generated with 4096"
+  },
+  "ifeval": {
+    "repo": "google/IFEval",
+    "config": null,
+    "split": "train",
+    "revision": "966cd89545d6b6acfd7638bc708b98261ca58e84",
+    "rows_in_split": 541,
+    "items": 541,
+    "max_tokens": 2048
+  },
+  "humaneval": {
+    "repo": "openai/openai_humaneval",
+    "config": null,
+    "split": "test",
+    "revision": "7dce6050a7d6d172f3cc5c32aa97f52fa1a2e544",
+    "rows_in_split": 164,
+    "items": 164,
+    "max_tokens": 1024
+  },
+  "jbb_harmful": {
+    "repo": "JailbreakBench/JBB-Behaviors",
+    "config": "behaviors",
+    "split": "harmful",
+    "revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+    "rows_in_split": 100,
+    "items": 100,
+    "max_tokens": 256
+  },
+  "jbb_benign": {
+    "repo": "JailbreakBench/JBB-Behaviors",
+    "config": "behaviors",
+    "split": "benign",
+    "revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+    "rows_in_split": 100,
+    "items": 100,
+    "max_tokens": 256
+  },
+  "harmless": {
+    "repo": "mlabonne/harmless_alpaca",
+    "config": null,
+    "split": "test",
+    "revision": "02c6a92cfcf11bb0c387334f8146d149d65b587f",
+    "rows_in_split": 6265,
+    "items": 200,
+    "max_tokens": 1
+  }
+}
