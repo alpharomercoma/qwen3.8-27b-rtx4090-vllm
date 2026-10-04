@@ -184,7 +184,8 @@ either model. Latency is per request with 16 in flight, so it includes queueing.
   was. This test does not measure how harmful Heretic's answers are.
 - **HumanEval runs model-written code.** It runs under its own otherwise unused uid with `no_new_privs` and no
   capabilities (so it cannot read the pod's key files or regain root; `score` refuses to run if that uid can read a
-  key file or if any process's command line, which every uid can read, holds a key), in Python's isolated mode, with an empty
+  key file, if any other file it can read holds a key, or if any process's command line, which every uid can read,
+  holds a key), in Python's isolated mode, with an empty
   environment and CPU, memory, file and process limits; after 20 s at most, every process of that uid is killed. The program reaches Python on stdin, and
   the directories that hold the tests (the eval data and the Hugging Face cache) are root-only, which scoring checks
   as the sandbox uid, but as in the official HumanEval harness the candidate and the tests run in one process:

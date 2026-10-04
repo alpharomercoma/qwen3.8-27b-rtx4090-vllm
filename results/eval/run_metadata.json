@@ -18,7 +18,7 @@
   "heretic.sha256": "f03556e2e28d79b045c42a14dd9d89921ea5dea95fb1db0f4da18e09819ea6ea",
   "original.sha256": "d0dbd08add79abd04cf6bee8d1abf8e94c35e74bff160808370baf9cde6a86b7"
  },
- "evalsuite_sha256": "2766acc11cf9751977556e849da93251499a429d63cfc12854203c99ee267cb1",
+ "evalsuite_sha256": "61733291972150186287d3b256e9b3dc345b3d220dd73300df61843ca98ab44e",
  "run_since": "2026-10-04T07:00:00Z",
  "summary_sha256": {
   "summary.json": "dc1c0ef09c1cd1d257c35b819958cc1db37413bb80f8efdbfc612233b94e3d92",
@@ -104,7 +104,7 @@
  },
  "rescored": [
   {
-   "written": "2026-10-04T14:54:18Z",
+   "written": "2026-10-04T15:14:56Z",
    "gpu": "NVIDIA GeForce RTX 4090, 580.159.04, 24564 MiB, 450.00 W",
    "cpu_count": 96,
    "eval_packages": {
@@ -114,7 +114,7 @@
     "nltk": "3.10.3",
     "aiohttp": "3.14.3"
    },
-   "evalsuite_sha256": "2766acc11cf9751977556e849da93251499a429d63cfc12854203c99ee267cb1",
+   "evalsuite_sha256": "61733291972150186287d3b256e9b3dc345b3d220dd73300df61843ca98ab44e",
    "summary_sha256": {
     "summary.json": "dc1c0ef09c1cd1d257c35b819958cc1db37413bb80f8efdbfc612233b94e3d92",
     "summary.md": "568ed0e68ac19c12b2716b1768b0925783ab8e21688c7c3aae06e0ebb4e80bd0"

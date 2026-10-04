@@ -449,8 +449,9 @@ def tests_unreachable():
 
 
 def secrets_unreachable():
-    """Fail closed unless the sandbox uid can reach no key: it cannot read the key files, and no process's command
-    line (readable by every uid in /proc) contains one. Environments are readable by their owner only."""
+    """Fail closed unless the sandbox uid can reach no key: it cannot read the key files, no other file it can read
+    holds one, and no process's command line (readable by every uid in /proc) contains one. Environments are
+    readable by their owner only."""
     keys = set()
     for f in SECRET_FILES:
         for q in ([Path(f)] if Path(f).is_file() else Path(f).rglob("*") if Path(f).is_dir() else []):
@@ -460,14 +461,23 @@ def secrets_unreachable():
                     keys |= {l.split()[-1] for l in text.splitlines() if l.split()}
                 elif q.name == ".api_key":
                     keys.add(text.strip())
-                else:  # key files: every line of the key material
-                    keys |= {l.strip() for l in text.splitlines() if l.strip() and not l.startswith("-----")}
-                    keys.add(text.strip())
+                elif not q.name.endswith(".pub"):  # private key files: the lines after the first, which carry the
+                    body = [l.strip() for l in text.splitlines() if l.strip() and not l.startswith("-----")]
+                    keys |= set(body[1:])  # key itself (the first line of every OpenSSH key is a fixed header)
                 probe = subprocess.run(["setpriv", f"--reuid={SANDBOX_UID}", f"--regid={SANDBOX_UID}", "--clear-groups",
                                         "--", "cat", str(q)], capture_output=True)
                 if probe.returncode == 0:
                     sys.exit(f"the sandbox uid can read {q}")
-    keys = {k for k in keys if len(k) >= 8}
+    keys = {k for k in keys if len(k) >= 8 and "\n" not in k}  # grep -f: one pattern per line
+    # Any file the sandbox uid can read (logs, caches, temp files) must not hold a key either: search them as that
+    # uid, with the keys on stdin so they appear on no command line and in no file. Model weights are skipped.
+    roots = [r for r in ("/workspace", "/tmp", "/var/tmp", "/dev/shm", "/var/log", "/etc", "/root", "/home", "/opt")
+             if Path(r).exists()]
+    found = subprocess.run(["setpriv", f"--reuid={SANDBOX_UID}", f"--regid={SANDBOX_UID}", "--clear-groups",
+                            "--no-new-privs", "--", "grep", "-rlsF", "-f", "-", "--exclude-dir=models", *roots],
+                           input="\n".join(sorted(keys)) + "\n", capture_output=True, text=True, timeout=1800).stdout
+    if found.strip():
+        sys.exit(f"files readable by the sandbox uid hold a key: {found.split()[:5]}")
     for cl in Path("/proc").glob("[0-9]*/cmdline"):
         try:
             text = cl.read_bytes().decode(errors="ignore")

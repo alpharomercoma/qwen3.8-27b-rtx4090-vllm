@@ -72,3 +72,10 @@ off its command line (`serve.sh`). Same reviewer and settings.
 | [22](2026-10-04_codex_terra_eval_round22.md) | 2 | A suspected quoting bug in Reproduce (not one: tested verbatim); `score` did not check `raw` against `refused` | Needs fixes |
 | [23](2026-10-04_codex_terra_eval_round23.md) | 1 | Published metadata had the previous scorer's hash after a failed push | Needs fixes |
 | [24](2026-10-04_codex_terra_eval_round24.md) | 0 | | **PASS** |
+
+After the push, an automated security review of the commit flagged sandbox secret exposure in `evalsuite.py`
+(three findings, no details given). Checked on the pod: no file readable by the sandbox uid held any of the pod's
+seven secret values (vLLM key, team keys, tunnel key lines). `score` now runs that search itself, as the sandbox uid
+with the values on stdin, over `/workspace` (except model weights), `/tmp`, `/var/tmp`, `/dev/shm`, `/var/log`,
+`/etc`, `/root`, `/home` and `/opt`, and refuses to run model code on a match. Tested: a planted readable copy of
+the vLLM key and of a tunnel-key line each stop scoring; the clean run passes and re-scores identically.
