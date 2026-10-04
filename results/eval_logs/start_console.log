@@ -1,0 +1,27 @@
+== 2026-10-04T07:17:14Z start
+model: heretic (JC1DA/Qwen3.8-27B-heretic-ara-W4A16, served as qwen3.8-27b-heretic)
+Using Python 3.11.13 environment at: /workspace/venvs/vllm
+Resolved 1 package in 319ms
+Downloading torchcodec (10.5MiB)
+ Downloading torchcodec
+Prepared 1 package in 1.03s
+Uninstalled 1 package in 9ms
+Installed 1 package in 7ms
+ - torchcodec==0.17.0
+ + torchcodec==0.16.0+cu129
+vllm 0.30.0
+INSTALL_VLLM_DONE
+[90mHint: The `hf-cli` skill is not installed. Run `hf skills add -g` to teach your AI agents how to use the `hf` CLI.[0m
+Fetching 22 files:   0%|          | 0/22 [00:00<?, ?it/s]Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 22 files:   5%|▍         | 1/22 [00:00<00:02,  8.66it/s]Fetching 22 files:   9%|▉         | 2/22 [00:00<00:02,  8.21it/s]Fetching 22 files:  14%|█▎        | 3/22 [00:00<00:02,  8.31it/s]Fetching 22 files:  23%|██▎       | 5/22 [00:00<00:01, 11.34it/s]Fetching 22 files:  32%|███▏      | 7/22 [00:14<00:48,  3.21s/it]Fetching 22 files:  36%|███▋      | 8/22 [00:14<00:34,  2.48s/it]Fetching 22 files:  41%|████      | 9/22 [00:15<00:24,  1.89s/it]Fetching 22 files:  45%|████▌     | 10/22 [00:22<00:39,  3.32s/it]Fetching 22 files:  50%|█████     | 11/22 [00:22<00:27,  2.48s/it]Fetching 22 files:  55%|█████▍    | 12/22 [00:22<00:18,  1.81s/it]Fetching 22 files:  59%|█████▉    | 13/22 [00:22<00:11,  1.32s/it]Fetching 22 files:  64%|██████▎   | 14/22 [00:24<00:12,  1.50s/it]Fetching 22 files:  73%|███████▎  | 16/22 [00:25<00:06,  1.01s/it]Fetching 22 files:  82%|████████▏ | 18/22 [00:26<00:03,  1.32it/s]Fetching 22 files:  91%|█████████ | 20/22 [00:26<00:01,  1.81it/s]Fetching 22 files:  95%|█████████▌| 21/22 [00:26<00:00,  2.12it/s]Fetching 22 files: 100%|██████████| 22/22 [00:26<00:00,  1.22s/it]
+FETCH_DONE
+2026-10-04T07:18:12Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{"max_cudagraph_capture_size":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208
+started heretic -> /workspace/logs/serve_heretic.log
+vLLM ready: qwen3.8-27b-heretic
+/tmp/caddy.tgz: OK
+gateway on 127.0.0.1:8443 (1 listener), authz on 127.0.0.1:8444; keys: team
+tunnel loop running (log /workspace/logs/edge_tunnel.log)
+heretic-tunnel@alphaexperiments.com: Permission denied (publickey).
+2026-10-04T07:23:18Z tunnel down (exit 0), retrying in 5 s
+!! vLLM and the gateway run, but the public URL answers 502: is this pod's tunnel key installed on the edge (docs/DEPLOY.md step 4)? tail /workspace/logs/edge_tunnel.log
+== 2026-10-04T07:24:28Z stopped

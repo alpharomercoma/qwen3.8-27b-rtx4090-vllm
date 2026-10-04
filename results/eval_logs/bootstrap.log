@@ -1,0 +1,45 @@
++ mkdir -p /workspace/logs /workspace/bin /workspace/models
++ cp /workspace/4090/pod/env.sh /workspace/env.sh
++ export DEBIAN_FRONTEND=noninteractive
++ DEBIAN_FRONTEND=noninteractive
++ apt-get update -qq
+W: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/InRelease: Key is stored in legacy trusted.gpg keyring (/etc/apt/trusted.gpg), see the DEPRECATION section in apt-key(8) for details.
++ apt-get install -y -qq tmux jq zstd cmake
++ C=/usr/local/cuda-12.8
++ '[' '!' -x /usr/local/cuda-12.8/bin/nvcc ']'
++ '[' '!' -f /usr/local/cuda-12.8/include/cublas_v2.h ']'
++ '[' '!' -f /usr/local/cuda-12.8/include/curand.h ']'
++ '[' '!' -f /usr/local/cuda-12.8/include/nvrtc.h ']'
++ UV_VERSION=0.12.19
++ UV_SHA256=23bf5552d220e0842b65c862097b2ebaeba0064b74eda5e565e77fd25969d8c8
++ command -v uv
++ . /workspace/env.sh
+++ export HF_HOME=/workspace/.cache/hf UV_CACHE_DIR=/workspace/.cache/uv UV_PYTHON_INSTALL_DIR=/workspace/.uv-python
+++ HF_HOME=/workspace/.cache/hf
+++ UV_CACHE_DIR=/workspace/.cache/uv
+++ UV_PYTHON_INSTALL_DIR=/workspace/.uv-python
+++ export PATH=/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ '[' -d /workspace/llama.cpp/build/bin ']'
+++ true
++ command -v hf
++ uv tool install -q 'huggingface_hub[hf_xet]'
++ '[' -f /workspace/.api_key ']'
++ python3 -c 'import secrets;print('\''sk-4090-'\''+secrets.token_hex(20))'
++ chmod 600 /workspace/.api_key
++ nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
+NVIDIA GeForce RTX 4090, 580.159.04
++ for tool in tmux jq uv hf
++ command -v tmux
++ for tool in tmux jq uv hf
++ command -v jq
++ for tool in tmux jq uv hf
++ command -v uv
++ for tool in tmux jq uv hf
++ command -v hf
++ /usr/local/cuda-12.8/bin/nvcc --version
++ tail -1
+Build cuda_12.8.r12.8/compiler.35583870_0
++ '[' -s /workspace/.api_key ']'
++ echo BOOTSTRAP_DONE
+BOOTSTRAP_DONE

@@ -1,0 +1,8 @@
+qwen3.8-27b-heretic gsm8k: 0 new items in 0 s
+qwen3.8-27b-heretic mmlu_pro: 1400 new items in 2707 s
+qwen3.8-27b-heretic ifeval: 541 new items in 308 s
+qwen3.8-27b-heretic humaneval: 164 new items in 87 s
+qwen3.8-27b-heretic jbb_harmful: 100 new items in 41 s
+qwen3.8-27b-heretic jbb_benign: 100 new items in 42 s
+qwen3.8-27b-heretic harmless: 200 new items in 3 s
+EVAL_DONE

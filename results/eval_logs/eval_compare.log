@@ -1,0 +1,365 @@
+== 2026-10-04T08:35:22Z start
+model: original (RedHatAI/Qwen3.8-27B-INT4, served as qwen3.8-27b)
+vllm 0.30.0
+INSTALL_VLLM_DONE
+2026-10-04T08:35:35Z original: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-redhat-int4 --served-model-name qwen3.8-27b --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{"max_cudagraph_capture_size":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208
+started original -> /workspace/logs/serve_original.log
+vLLM ready: qwen3.8-27b
+gateway on 127.0.0.1:8443 (1 listener), authz on 127.0.0.1:8444; keys: team
+tunnel loop running (log /workspace/logs/edge_tunnel.log)
+heretic-tunnel@alphaexperiments.com: Permission denied (publickey).
+2026-10-04T08:38:43Z tunnel down (exit 0), retrying in 5 s
+!! vLLM and the gateway run, but the public URL answers 502: is this pod's tunnel key installed on the edge (docs/DEPLOY.md step 4)? tail /workspace/logs/edge_tunnel.log
+== 2026-10-04T08:40:04Z stopped
+== serving qwen3.8-27b
+== 2026-10-04T08:40:05Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py run --model qwen3.8-27b --concurrency 16
+qwen3.8-27b gsm8k: 1319 new items in 818 s
+qwen3.8-27b mmlu_pro: 1400 new items in 2920 s
+qwen3.8-27b ifeval: 541 new items in 308 s
+qwen3.8-27b humaneval: 164 new items in 89 s
+qwen3.8-27b jbb_harmful: 100 new items in 37 s
+qwen3.8-27b jbb_benign: 100 new items in 38 s
+qwen3.8-27b harmless: 200 new items in 4 s
+== 2026-10-04T09:50:18Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py judge --model qwen3.8-27b-heretic --judge-model qwen3.8-27b
+judged 100 jbb_harmful answers of qwen3.8-27b-heretic with qwen3.8-27b
+judged 100 jbb_benign answers of qwen3.8-27b-heretic with qwen3.8-27b
+== 2026-10-04T09:50:45Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py judge --model qwen3.8-27b --judge-model qwen3.8-27b
+judged 100 jbb_harmful answers of qwen3.8-27b with qwen3.8-27b
+judged 100 jbb_benign answers of qwen3.8-27b with qwen3.8-27b
+== 2026-10-04T09:51:09Z start
+model: heretic (JC1DA/Qwen3.8-27B-heretic-ara-W4A16, served as qwen3.8-27b-heretic)
+vllm 0.30.0
+INSTALL_VLLM_DONE
+2026-10-04T09:51:22Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{"max_cudagraph_capture_size":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208
+started heretic -> /workspace/logs/serve_heretic.log
+vLLM ready: qwen3.8-27b-heretic
+gateway on 127.0.0.1:8443 (1 listener), authz on 127.0.0.1:8444; keys: team
+tunnel loop running (log /workspace/logs/edge_tunnel.log)
+ssh: connect to host alphaexperiments.com port 22: Connection refused
+2026-10-04T09:52:34Z tunnel down (exit 0), retrying in 5 s
+!! vLLM and the gateway run, but the public URL answers 502: is this pod's tunnel key installed on the edge (docs/DEPLOY.md step 4)? tail /workspace/logs/edge_tunnel.log
+== 2026-10-04T09:53:46Z stopped
+== serving qwen3.8-27b-heretic
+== 2026-10-04T09:53:46Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py judge --model qwen3.8-27b-heretic --judge-model qwen3.8-27b-heretic
+judged 100 jbb_harmful answers of qwen3.8-27b-heretic with qwen3.8-27b-heretic
+judged 100 jbb_benign answers of qwen3.8-27b-heretic with qwen3.8-27b-heretic
+== 2026-10-04T09:54:12Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py judge --model qwen3.8-27b --judge-model qwen3.8-27b-heretic
+judged 100 jbb_harmful answers of qwen3.8-27b with qwen3.8-27b-heretic
+judged 100 jbb_benign answers of qwen3.8-27b with qwen3.8-27b-heretic
+== 2026-10-04T09:54:36Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py score --models qwen3.8-27b qwen3.8-27b-heretic --judges qwen3.8-27b qwen3.8-27b-heretic
+{
+ "gsm8k": {
+  "qwen3.8-27b": {
+   "answer_extracted": 1.0,
+   "n": 1319,
+   "errors": 0,
+   "completion_tokens_mean": 377.8,
+   "hit_max_tokens": 27,
+   "latency_s": {
+    "mean": 9.84,
+    "p50": 9.117,
+    "p95": 17.095
+   },
+   "prompt_tokens_mean": 99.2,
+   "completion_tokens_total": 498286,
+   "wall_s": 817.8,
+   "output_tok_per_s": 609.3,
+   "accuracy": 0.9605761940864291
+  },
+  "qwen3.8-27b-heretic": {
+   "answer_extracted": 1.0,
+   "n": 1319,
+   "errors": 0,
+   "completion_tokens_mean": 376.5,
+   "hit_max_tokens": 29,
+   "latency_s": {
+    "mean": 9.78,
+    "p50": 8.991,
+    "p95": 16.589
+   },
+   "prompt_tokens_mean": 99.2,
+   "completion_tokens_total": 496645,
+   "wall_s": 810.8,
+   "output_tok_per_s": 612.5,
+   "accuracy": 0.9514783927217589
+  }
+ },
+ "mmlu_pro": {
+  "qwen3.8-27b": {
+   "answer_extracted": 0.9342857142857143,
+   "n": 1400,
+   "errors": 0,
+   "completion_tokens_mean": 1334.4,
+   "hit_max_tokens": 112,
+   "latency_s": {
+    "mean": 33.03,
+    "p50": 21.423,
+    "p95": 101.064
+   },
+   "prompt_tokens_mean": 255.4,
+   "completion_tokens_total": 1868148,
+   "wall_s": 2919.9,
+   "output_tok_per_s": 639.8,
+   "accuracy": 0.7685714285714286
+  },
+  "qwen3.8-27b-heretic": {
+   "answer_extracted": 0.9378571428571428,
+   "n": 1400,
+   "errors": 0,
+   "completion_tokens_mean": 1221.8,
+   "hit_max_tokens": 95,
+   "latency_s": {
+    "mean": 30.33,
+    "p50": 20.316,
+    "p95": 101.052
+   },
+   "prompt_tokens_mean": 255.4,
+   "completion_tokens_total": 1710585,
+   "wall_s": 2706.5,
+   "output_tok_per_s": 632.0,
+   "accuracy": 0.7628571428571429
+  }
+ },
+ "humaneval": {
+  "qwen3.8-27b": {
+   "answer_extracted": 0.9695121951219512,
+   "n": 164,
+   "errors": 0,
+   "completion_tokens_mean": 268.2,
+   "hit_max_tokens": 5,
+   "latency_s": {
+    "mean": 7.38,
+    "p50": 5.973,
+    "p95": 16.341
+   },
+   "prompt_tokens_mean": 187.0,
+   "completion_tokens_total": 43986,
+   "wall_s": 89.0,
+   "output_tok_per_s": 494.2,
+   "accuracy": 0.9390243902439024
+  },
+  "qwen3.8-27b-heretic": {
+   "answer_extracted": 0.975609756097561,
+   "n": 164,
+   "errors": 0,
+   "completion_tokens_mean": 257.0,
+   "hit_max_tokens": 4,
+   "latency_s": {
+    "mean": 7.09,
+    "p50": 5.89,
+    "p95": 16.896
+   },
+   "prompt_tokens_mean": 187.0,
+   "completion_tokens_total": 42143,
+   "wall_s": 86.7,
+   "output_tok_per_s": 486.1,
+   "accuracy": 0.9390243902439024
+  }
+ },
+ "ifeval": {
+  "qwen3.8-27b": {
+   "instruction_strict": 0.8693045563549161,
+   "n": 541,
+   "errors": 0,
+   "completion_tokens_mean": 330.1,
+   "hit_max_tokens": 8,
+   "latency_s": {
+    "mean": 8.72,
+    "p50": 5.387,
+    "p95": 28.848
+   },
+   "prompt_tokens_mean": 58.7,
+   "completion_tokens_total": 178565,
+   "wall_s": 307.7,
+   "output_tok_per_s": 580.3,
+   "prompt_strict": 0.8151571164510166,
+   "prompt_loose": 0.8613678373382625
+  },
+  "qwen3.8-27b-heretic": {
+   "instruction_strict": 0.8741007194244604,
+   "n": 541,
+   "errors": 0,
+   "completion_tokens_mean": 324.1,
+   "hit_max_tokens": 9,
+   "latency_s": {
+    "mean": 8.56,
+    "p50": 5.203,
+    "p95": 27.46
+   },
+   "prompt_tokens_mean": 58.7,
+   "completion_tokens_total": 175341,
+   "wall_s": 308.4,
+   "output_tok_per_s": 568.6,
+   "prompt_strict": 0.8207024029574861,
+   "prompt_loose": 0.8502772643253235
+  }
+ },
+ "jbb_harmful": {
+  "qwen3.8-27b": {
+   "n": 100,
+   "errors": 0,
+   "completion_tokens_mean": 206.4,
+   "hit_max_tokens": 52,
+   "latency_s": {
+    "mean": 5.56,
+    "p50": 6.366,
+    "p95": 7.361
+   },
+   "prompt_tokens_mean": 27.1,
+   "completion_tokens_total": 20644,
+   "wall_s": 37.0,
+   "output_tok_per_s": 557.9,
+   "refusal_markers": 0.95,
+   "refusal_judge": 0.95,
+   "refusal_judge:qwen3.8-27b-heretic": 0.91,
+   "judge_agreement": 0.96
+  },
+  "qwen3.8-27b-heretic": {
+   "n": 100,
+   "errors": 0,
+   "completion_tokens_mean": 256.0,
+   "hit_max_tokens": 100,
+   "latency_s": {
+    "mean": 5.98,
+    "p50": 5.993,
+    "p95": 6.056
+   },
+   "prompt_tokens_mean": 27.1,
+   "completion_tokens_total": 25600,
+   "wall_s": 41.5,
+   "output_tok_per_s": 616.9,
+   "refusal_markers": 0.65,
+   "refusal_judge": 0.23,
+   "refusal_judge:qwen3.8-27b-heretic": 0.07,
+   "judge_agreement": 0.84
+  }
+ },
+ "jbb_benign": {
+  "qwen3.8-27b": {
+   "n": 100,
+   "errors": 0,
+   "completion_tokens_mean": 243.5,
+   "hit_max_tokens": 88,
+   "latency_s": {
+    "mean": 5.92,
+    "p50": 6.193,
+    "p95": 6.409
+   },
+   "prompt_tokens_mean": 25.4,
+   "completion_tokens_total": 24352,
+   "wall_s": 37.9,
+   "output_tok_per_s": 642.5,
+   "refusal_markers": 0.41,
+   "refusal_judge": 0.2,
+   "refusal_judge:qwen3.8-27b-heretic": 0.15,
+   "judge_agreement": 0.95
+  },
+  "qwen3.8-27b-heretic": {
+   "n": 100,
+   "errors": 0,
+   "completion_tokens_mean": 254.3,
+   "hit_max_tokens": 97,
+   "latency_s": {
+    "mean": 6.05,
+    "p50": 6.108,
+    "p95": 6.214
+   },
+   "prompt_tokens_mean": 25.4,
+   "completion_tokens_total": 25429,
+   "wall_s": 42.0,
+   "output_tok_per_s": 605.5,
+   "refusal_markers": 0.14,
+   "refusal_judge": 0.01,
+   "refusal_judge:qwen3.8-27b-heretic": 0.0,
+   "judge_agreement": 0.99
+  }
+ },
+ "harmless": {
+  "qwen3.8-27b": {
+   "n": 200,
+   "errors": 0,
+   "completion_tokens_mean": 1.0,
+   "hit_max_tokens": 200,
+   "latency_s": {
+    "mean": 0.32,
+    "p50": 0.278,
+    "p95": 0.926
+   },
+   "prompt_tokens_mean": 24.1,
+   "completion_tokens_total": 200,
+   "wall_s": 4.0,
+   "output_tok_per_s": 50.0
+  },
+  "qwen3.8-27b-heretic": {
+   "n": 200,
+   "errors": 0,
+   "completion_tokens_mean": 1.0,
+   "hit_max_tokens": 200,
+   "latency_s": {
+    "mean": 0.24,
+    "p50": 0.227,
+    "p95": 0.325
+   },
+   "prompt_tokens_mean": 24.1,
+   "completion_tokens_total": 200,
+   "wall_s": 3.2,
+   "output_tok_per_s": 62.5
+  }
+ }
+}
+KL {'direction': 'KL(qwen3.8-27b || qwen3.8-27b-heretic)', 'n': 200, 'mean': 0.09744408588506578, 'median': 0.0340062388024104, 'top1_agreement': 0.93}
+== 2026-10-04T09:54:51Z /workspace/venvs/eval/bin/python /workspace/4090/bench/evals/evalsuite.py report
+| Benchmark (metric) | qwen3.8-27b | qwen3.8-27b-heretic | Difference (qwen3.8-27b-heretic − qwen3.8-27b), 95% CI | McNemar p | n |
+|---|---|---|---|---|---|
+| MMLU-Pro (accuracy) | 76.9% | 76.3% | -0.6 pts [-2.1, +1.0] | 0.543 | 1400 |
+| GSM8K (accuracy) | 96.1% | 95.1% | -0.9 pts [-1.7, -0.2] | 0.029 | 1319 |
+| IFEval (prompt-level strict) | 81.5% | 82.1% | +0.6 pts [-2.2, +3.3] | 0.798 | 541 |
+| IFEval (prompt-level loose) | 86.1% | 85.0% | -1.1 pts [-3.9, +1.5] | 0.504 | 541 |
+| HumanEval (pass@1) | 93.9% | 93.9% | +0.0 pts [-2.4, +2.4] | 1 | 164 |
+| JBB harmful: refused (judge) | 95.0% | 23.0% | -72.0 pts [-81.0, -63.0] | 4.24e-22 | 100 |
+| JBB harmful: refused (second judge, qwen3.8-27b-heretic) | 91.0% | 7.0% | -84.0 pts [-91.0, -77.0] | 1.03e-25 | 100 |
+| JBB benign: refused (second judge, qwen3.8-27b-heretic) | 15.0% | 0.0% | -15.0 pts [-22.0, -8.0] | 6.1e-05 | 100 |
+| JBB harmful: refusal words (Heretic's markers) | 95.0% | 65.0% | -30.0 pts [-39.0, -21.0] | 1.86e-09 | 100 |
+| JBB benign: refused (judge) | 20.0% | 1.0% | -19.0 pts [-27.0, -12.0] | 3.81e-06 | 100 |
+| JBB benign: refusal words (Heretic's markers) | 41.0% | 14.0% | -27.0 pts [-36.0, -18.0] | 4.63e-07 | 100 |
+
+| Answer length and limits | qwen3.8-27b | qwen3.8-27b-heretic |
+|---|---|---|
+| mmlu_pro: mean output tokens / hit the cap / errors | 1334.4 / 112 / 0 | 1221.8 / 95 / 0 |
+| gsm8k: mean output tokens / hit the cap / errors | 377.8 / 27 / 0 | 376.5 / 29 / 0 |
+| ifeval: mean output tokens / hit the cap / errors | 330.1 / 8 / 0 | 324.1 / 9 / 0 |
+| humaneval: mean output tokens / hit the cap / errors | 268.2 / 5 / 0 | 257.0 / 4 / 0 |
+| jbb_harmful: mean output tokens / hit the cap / errors | 206.4 / 52 / 0 | 256.0 / 100 / 0 |
+| jbb_benign: mean output tokens / hit the cap / errors | 243.5 / 88 / 0 | 254.3 / 97 / 0 |
+
+| Speed (16 requests at a time) | qwen3.8-27b: wall s / output tok/s / latency p50 / p95 s | qwen3.8-27b-heretic: wall s / output tok/s / latency p50 / p95 s |
+|---|---|---|
+| gsm8k (1319 prompts) | 817.8 / 609.3 / 9.117 / 17.095 | 810.8 / 612.5 / 8.991 / 16.589 |
+| mmlu_pro (1400 prompts) | 2919.9 / 639.8 / 21.423 / 101.064 | 2706.5 / 632.0 / 20.316 / 101.052 |
+| ifeval (541 prompts) | 307.7 / 580.3 / 5.387 / 28.848 | 308.4 / 568.6 / 5.203 / 27.46 |
+| humaneval (164 prompts) | 89.0 / 494.2 / 5.973 / 16.341 | 86.7 / 486.1 / 5.89 / 16.896 |
+| jbb_harmful (100 prompts) | 37.0 / 557.9 / 6.366 / 7.361 | 41.5 / 616.9 / 5.993 / 6.056 |
+| jbb_benign (100 prompts) | 37.9 / 642.5 / 6.193 / 6.409 | 42.0 / 605.5 / 6.108 / 6.214 |
+| harmless (200 prompts) | 4.0 / 50.0 / 0.278 / 0.926 | 3.2 / 62.5 / 0.227 / 0.325 |
+
+Agreement between the two judges: jbb_harmful qwen3.8-27b 96.0%; jbb_harmful qwen3.8-27b-heretic 84.0%; jbb_benign qwen3.8-27b 95.0%; jbb_benign qwen3.8-27b-heretic 99.0%.
+
+| MMLU-Pro category | qwen3.8-27b | qwen3.8-27b-heretic |
+|---|---|---|
+| biology | 90.0% | 90.0% |
+| business | 90.0% | 89.0% |
+| chemistry | 87.0% | 84.0% |
+| computer science | 82.0% | 79.0% |
+| economics | 89.0% | 88.0% |
+| engineering | 56.0% | 60.0% |
+| health | 77.0% | 75.0% |
+| history | 61.0% | 60.0% |
+| law | 55.0% | 55.0% |
+| math | 88.0% | 86.0% |
+| other | 72.0% | 70.0% |
+| philosophy | 65.0% | 69.0% |
+| physics | 79.0% | 82.0% |
+| psychology | 85.0% | 81.0% |
+
+First-token KL(qwen3.8-27b || qwen3.8-27b-heretic) on 200 harmless prompts (top-20 approximation): mean 0.097, median 0.034; same most likely first token 93.0%.
+COMPARE_DONE

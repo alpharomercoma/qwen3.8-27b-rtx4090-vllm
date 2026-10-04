@@ -1,0 +1,105 @@
+{
+ "written": "2026-10-04T13:26:20Z",
+ "gpu": "NVIDIA GeForce RTX 4090, 580.159.04, 24564 MiB, 450.00 W",
+ "cpu_count": 96,
+ "vllm_torch": "0.30.0 2.13.0+cu129",
+ "eval_packages": {
+  "lm_eval": "0.4.13",
+  "datasets": "5.0.1",
+  "langdetect": "1.0.9",
+  "nltk": "3.10.3",
+  "aiohttp": "3.14.3"
+ },
+ "models": {
+  "heretic": "JC1DA/Qwen3.8-27B-heretic-ara-W4A16@0a191462511776109c129dda0772d33ae9b85be9 qwen3.8-27b-heretic",
+  "original": "RedHatAI/Qwen3.8-27B-INT4@91bd022d5b49442a868bc35008f6c21e1860edfa qwen3.8-27b"
+ },
+ "model_manifest_sha256": {
+  "heretic.sha256": "f03556e2e28d79b045c42a14dd9d89921ea5dea95fb1db0f4da18e09819ea6ea",
+  "original.sha256": "d0dbd08add79abd04cf6bee8d1abf8e94c35e74bff160808370baf9cde6a86b7"
+ },
+ "evalsuite_sha256": "49cf0f0bdbf99418c2ae30345f7d978e0e1cfb2fcd61de3b5767ca4aac4c48ad",
+ "run_since": "2026-10-04T07:00:00Z",
+ "summary_sha256": {
+  "summary.json": "c76eaf05fdcda11ca3b0ef78dcd87227dd57bbfe31450db5a5b5ac818bcd8eda",
+  "summary.md": "568ed0e68ac19c12b2716b1768b0925783ab8e21688c7c3aae06e0ebb4e80bd0"
+ },
+ "serve_history": [
+  "2026-10-04T07:18:12Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T08:35:35Z original: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-redhat-int4 --served-model-name qwen3.8-27b --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T09:51:22Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T11:21:55Z original: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-redhat-int4 --served-model-name qwen3.8-27b --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T11:23:53Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T11:28:37Z original: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-redhat-int4 --served-model-name qwen3.8-27b --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T11:30:19Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --api-key <key> --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T11:46:08Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T12:23:33Z original: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-redhat-int4 --served-model-name qwen3.8-27b --host 127.0.0.1 --port 8000 --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208",
+  "2026-10-04T12:25:19Z heretic: env PATH=/workspace/venvs/vllm/bin:/usr/local/cuda-12.8/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/workspace/bin:/usr/local/cuda/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin CUDA_HOME=/usr/local/cuda-12.8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True /workspace/venvs/vllm/bin/vllm serve /workspace/models/qwen38-heretic-ara-w4a16 --served-model-name qwen3.8-27b-heretic --host 127.0.0.1 --port 8000 --language-model-only --gpu-memory-utilization 0.95 --kv-cache-dtype fp8 --mamba-ssm-cache-dtype float16 --max-num-batched-tokens 2048 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder --enable-prompt-tokens-details --compilation-config '{\"max_cudagraph_capture_size\":32}' --max-model-len 65536 --max-num-seqs 16 --enable-prefix-caching --mamba-cache-mode align --kv-cache-dtype int4_per_token_head --attention-backend TRITON_ATTN --kv-cache-memory-bytes 4831838208"
+ ],
+ "datasets": {
+  "gsm8k": {
+   "repo": "openai/gsm8k",
+   "config": "main",
+   "split": "test",
+   "revision": "740312add88f781978c0658806c59bc2815b9866",
+   "rows_in_split": 1319,
+   "items": 1319,
+   "max_tokens": 1024
+  },
+  "mmlu_pro": {
+   "repo": "TIGER-Lab/MMLU-Pro",
+   "config": null,
+   "split": "test",
+   "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+   "rows_in_split": 12032,
+   "items": 1400,
+   "max_tokens": 4096,
+   "max_tokens_note": "prepare ran with 2048; raised to 4096 before either full MMLU-Pro run, so every MMLU-Pro answer of both models was generated with 4096"
+  },
+  "ifeval": {
+   "repo": "google/IFEval",
+   "config": null,
+   "split": "train",
+   "revision": "966cd89545d6b6acfd7638bc708b98261ca58e84",
+   "rows_in_split": 541,
+   "items": 541,
+   "max_tokens": 2048
+  },
+  "humaneval": {
+   "repo": "openai/openai_humaneval",
+   "config": null,
+   "split": "test",
+   "revision": "7dce6050a7d6d172f3cc5c32aa97f52fa1a2e544",
+   "rows_in_split": 164,
+   "items": 164,
+   "max_tokens": 1024
+  },
+  "jbb_harmful": {
+   "repo": "JailbreakBench/JBB-Behaviors",
+   "config": "behaviors",
+   "split": "harmful",
+   "revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+   "rows_in_split": 100,
+   "items": 100,
+   "max_tokens": 256
+  },
+  "jbb_benign": {
+   "repo": "JailbreakBench/JBB-Behaviors",
+   "config": "behaviors",
+   "split": "benign",
+   "revision": "886acc352a31533ffbcf4ef22c744658688086fc",
+   "rows_in_split": 100,
+   "items": 100,
+   "max_tokens": 256
+  },
+  "harmless": {
+   "repo": "mlabonne/harmless_alpaca",
+   "config": null,
+   "split": "test",
+   "revision": "02c6a92cfcf11bb0c387334f8146d149d65b587f",
+   "rows_in_split": 6265,
+   "items": 200,
+   "max_tokens": 1
+  }
+ }
+}
