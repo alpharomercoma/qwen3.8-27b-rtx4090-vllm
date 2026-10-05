@@ -1,6 +1,8 @@
 #!/bin/bash
 # MAC. Point the scripts at a RunPod pod: read its public SSH address and SSH host keys through RunPod's own SSH proxy
 # (whose host key is pinned in scripts/runpod_known_hosts), then write .pod_env and .pod_known_hosts. Run it once per pod, and again when a restarted pod gets a new address.
+# If the pod does not accept ~/.ssh/id_ed25519 for direct SSH yet (RunPod installs only the account's keys), the
+# public key is added to the pod's authorized_keys through the proxy, which already accepts it.
 # usage: scripts/pod_connect.sh <pod-id>-<suffix>@ssh.runpod.io        (the "SSH" command RunPod shows for the pod)
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")/.." && pwd)
@@ -23,3 +25,17 @@ ip=${addr% *}; port=${addr#* }
 printf 'POD_SSH_HOST=root@%s\nPOD_SSH_PORT=%s\nPOD_SSH_PROXY=%s\n' "$ip" "$port" "$PROXY" > "$HERE/.pod_env"
 printf '%s\n' "$keys" | sed "s|^|[$ip]:$port |" > "$HERE/.pod_known_hosts"
 echo "pod at root@$ip port $port; $(wc -l < "$HERE/.pod_known_hosts" | tr -d ' ') host key(s) pinned in .pod_known_hosts"
+direct() { ssh -S none -o ControlMaster=no -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes \
+             -o UserKnownHostsFile="$HERE/.pod_known_hosts" -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519 -p "$port" \
+             "root@$ip" true 2>/dev/null; }
+if ! direct; then
+  pub=$(cat ~/.ssh/id_ed25519.pub)
+  [[ $pub =~ ^ssh-ed25519\ [A-Za-z0-9+/]+=*(\ [^\'\"]*)?$ ]] || { echo "$HOME/.ssh/id_ed25519.pub is not a plain ed25519 key"; exit 1; }
+  { printf '%s\n' "mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/authorized_keys && (grep -qF '${pub#* }' ~/.ssh/authorized_keys || printf '%s\\n' '$pub' >> ~/.ssh/authorized_keys) && chmod 600 ~/.ssh/authorized_keys" 'exit'; } |
+    ssh -tt -o ConnectTimeout=20 -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$HERE/scripts/runpod_known_hosts" \
+        -i ~/.ssh/id_ed25519 "$PROXY" >/dev/null 2>&1 || true
+  direct || { echo "direct SSH to root@$ip:$port still refuses ~/.ssh/id_ed25519: add its public key in RunPod (Settings,"
+              echo "SSH public keys) or to the pod's ~/.ssh/authorized_keys, then rerun"; exit 1; }
+  echo "added ~/.ssh/id_ed25519.pub to the pod's authorized_keys (through RunPod's proxy)"
+fi
+echo "direct SSH works"

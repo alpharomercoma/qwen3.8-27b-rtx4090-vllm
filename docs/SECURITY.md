@@ -44,7 +44,7 @@ None of these are in git. `.gitignore` covers `.env`, `.pod_env`, `.vercel/`, `.
 
 | Secret | Where | Who needs it |
 |---|---|---|
-| Team API keys | pod `/workspace/.team_api_keys` (mode 600); each user's shell profile | pi, opencode, scripts |
+| Team API keys | pod `/workspace/.team_api_keys` (mode 600); a copy on the operator's Mac in `.team_api_keys` (mode 600, gitignored), which `scripts/new_pod.sh` puts on each new pod; each user's shell profile | pi, opencode, scripts |
 | vLLM's own key | pod `/workspace/.api_key` (mode 600, except on a RunPod network volume, which ignores file modes: there any user in the container could read the key files, and only root runs there); vLLM gets it through `VLLM_API_KEY`, not its command line, which every local user can read in `/proc` (since 2026-10-04: on a pod started before that, run `tmux kill-server` and `start.sh` once, because the tmux server keeps its first command line) | only the gateway |
 | Tunnel private key | pod `/workspace/.secrets/edge_tunnel_ed25519` (mode 600) | only the tunnel |
 | `APP_PASSWORD`, `SESSION_SECRET` | Vercel project env, production, `SESSION_SECRET` marked sensitive | the web app |

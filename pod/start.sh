@@ -53,5 +53,7 @@ for _ in $(seq 12); do
   [ "$code" = 401 ] && break
   sleep 5
 done
-[ "$code" = 401 ] || fail "vLLM and the gateway run, but the public URL answers $code: is this pod's tunnel key installed on the edge (docs/DEPLOY.md step 4)? tail /workspace/logs/edge_tunnel.log"
+# exit 3 (not 1): everything on the pod runs, only the edge does not trust this pod's tunnel key yet (new_pod.sh then
+# installs it)
+[ "$code" = 401 ] || { echo "!! vLLM and the gateway run, but the public URL answers $code: is this pod's tunnel key installed on the edge (docs/DEPLOY.md step 4)? tail /workspace/logs/edge_tunnel.log"; echo "== $(date -u +%FT%TZ) stopped"; exit 3; }
 echo "== $(date -u +%FT%TZ) up: https://alphaexperiments.com/heretic-inference"

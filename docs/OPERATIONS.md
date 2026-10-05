@@ -51,16 +51,19 @@ What a switch does:
 
 ## Move to a new pod
 
-A new pod has a new address and an empty `/workspace`.
+One command, from the repo root (details: [DEPLOY.md → One command](DEPLOY.md#one-command-a-new-pod-for-the-running-service)):
 
-| Step | Command |
-|---|---|
-| 1. New address and host keys | `scripts/pod_connect.sh <pod-id>-<suffix>@ssh.runpod.io` ([DEPLOY.md step 1](DEPLOY.md#1-point-the-scripts-at-the-pod-mac)) |
-| 2. Install and start | `scripts/push.sh && POD_TIMEOUT=1800 scripts/pod.sh <<<'bash /workspace/4090/pod/start.sh'` (add `original` for the original model) |
-| 3. Trust its tunnel key on the edge | `POD_PUBKEY="$(scripts/pod.sh <<<'bash /workspace/4090/pod/gateway/edge_tunnel.sh pubkey')" scripts/edge.sh install` (replaces the old pod's key) |
-| 4. New team keys | `scripts/pod.sh <<<'bash /workspace/4090/pod/gateway/keys.sh add <name>'` for each person: keys lived on the old volume |
+```bash
+scripts/new_pod.sh <pod-id>-<suffix>@ssh.runpod.io     # or: ... original
+```
 
-The web app, the edge routes and the client configs do not change.
+It connects to the pod (and authorizes your SSH key there if needed), copies the team API keys from
+`.team_api_keys` on your Mac, installs and starts everything, makes the edge trust the pod's tunnel, and checks a
+real answer through `alphaexperiments.com`. The web app, the edge routes, the team keys and the client configs do
+not change. The same command reconnects a stopped pod that came back with a new address.
+
+After adding or revoking a key on the pod, copy the file back so the next pod gets it too:
+`(umask 077; scripts/pod.sh <<<'cat /workspace/.team_api_keys' > .team_api_keys)`.
 
 ## Keys and passwords
 

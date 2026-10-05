@@ -3,6 +3,34 @@
 Seven steps, in order. Each says what it does, where to run it, and how to check it worked.
 What the pieces are: [ARCHITECTURE.md](ARCHITECTURE.md). Day-to-day tasks afterwards: [OPERATIONS.md](OPERATIONS.md).
 
+## One command: a new pod for the running service
+
+Once the edge (step 4) and the web app (steps 5-6) are set up, which is a one-time job, a new or restarted GPU pod is
+hooked up with one command from the repo root on the Mac:
+
+```bash
+scripts/new_pod.sh <pod-id>-<suffix>@ssh.runpod.io            # add "original" to serve the original model
+E2E_PASSWORD=<web password> scripts/new_pod.sh <...>@ssh.runpod.io   # same, and also run the web app's tests
+```
+
+`<pod-id>-<suffix>@ssh.runpod.io` is the address in the SSH command RunPod shows for the pod. The pod needs an
+RTX 4090 (driver 570 or newer), "SSH over exposed TCP" on, and a `/workspace` volume of at least 50 GB (a network
+volume works; one that already holds the model and installs makes the next pod start in minutes).
+
+| Step | What happens |
+|---|---|
+| 1 | The previous pod's `.pod_env` and `.pod_known_hosts` are kept as `.prev-<pod-id>` |
+| 2 | `pod_connect.sh`: the pod's address and SSH host keys, read through RunPod's proxy and pinned; if the pod does not accept `~/.ssh/id_ed25519` yet, its public key is added through the proxy |
+| 3 | Team API keys: `.team_api_keys` on the Mac (gitignored, mode 600) is copied to the pod, so everyone's key keeps working on the new pod |
+| 4 | The code is pushed and `pod/start.sh` runs on the pod in the background (tools, vLLM, model download and check, server, gateway, tunnel): 20-30 min the first time. Its progress is printed; a dropped SSH connection does not stop it |
+| 5 | The edge trusts the pod's tunnel key (`scripts/edge.sh install`, replacing the previous pod's) |
+| 6 | Checks through `alphaexperiments.com`: 401 without a key, the model list and a short answer with a team key |
+| 7 | The pod's team keys are copied back to `.team_api_keys`; with `E2E_PASSWORD` set, the Playwright tests run against the live site |
+
+It can be rerun at any time: finished steps are skipped, and a rerun on the live pod restarts the gateway and tunnel
+for a few seconds. The first time, without a `.team_api_keys` on the Mac, the pod creates a key labelled `team` and
+it is saved there. The steps below do the same by hand, and set up the parts `new_pod.sh` relies on.
+
 ## 0. What you need
 
 | Item | Details |
