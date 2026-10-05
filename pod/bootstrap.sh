@@ -32,7 +32,13 @@ command -v hf >/dev/null || uv tool install -q "huggingface_hub[hf_xet]"
 # every key file root-only, also ones that already existed (a volume can come from elsewhere)
 for f in /workspace/.api_key /workspace/.team_api_keys; do [ -e "$f" ] && chown root:root "$f" && chmod 600 "$f"; done
 [ -d /workspace/.secrets ] && chown -R root:root /workspace/.secrets && chmod -R go-rwx /workspace/.secrets
-[ "$(stat -c '%u %a' /workspace/.api_key)" = "0 600" ] || { echo "/workspace/.api_key is not root-only"; exit 1; }
+if [ "$(stat -c '%u %a' /workspace/.api_key)" != "0 600" ]; then
+  # A RunPod network volume (FUSE) ignores chmod: every file reads 666. Then the keys cannot be made root-only;
+  # only root runs in this container, so say so and go on (the eval sandbox refuses to run on such a volume).
+  probe=/workspace/.mode_probe; : > $probe; chmod 600 $probe; mode=$(stat -c %a $probe); rm -f $probe
+  [ "$mode" != 600 ] || { echo "/workspace/.api_key is not root-only"; exit 1; }
+  echo "WARNING: /workspace ignores file modes (network volume): key files are readable by any user in this container"
+fi
 nvidia-smi --query-gpu=name,driver_version --format=csv,noheader
 # everything start.sh relies on, or stop here with a clear failure
 for tool in tmux jq uv hf; do command -v "$tool" >/dev/null || { echo "bootstrap: $tool is missing"; exit 1; }; done

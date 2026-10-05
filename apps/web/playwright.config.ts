@@ -19,7 +19,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], channel: "chrome" } },
+    { name: "desktop", use: { ...devices["Desktop Chrome"], channel: "chrome" }, grepInvert: /@phone/ },
     { name: "phone", use: { ...devices["Pixel 7"], channel: "chrome" }, grep: /@phone/ },
   ],
 });
