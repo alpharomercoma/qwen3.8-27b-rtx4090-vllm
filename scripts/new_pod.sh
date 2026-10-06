@@ -31,6 +31,14 @@ fi
 step "2/7 connect"
 scripts/pod_connect.sh "$PROXY"
 pod <<<'nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader; df -h /workspace | tail -1'
+# A migrated pod's volume is copied in after the pod starts; until the copy ends its directories belong to the copier
+# and root cannot write there. Wait for that instead of failing halfway through the install.
+if ! pod <<<'p=/workspace/.new_pod_probe; touch $p && rm -f $p' >/dev/null 2>&1; then
+  echo "/workspace is not writable yet. If RunPod is copying a migrated volume onto this pod, 'df -h /workspace' keeps"
+  echo "growing: rerun this script once it has stopped. Owners now:"
+  pod <<<'ls -lan /workspace | awk "NR>1{print \$3\":\"\$4, \$1, \$NF}"'
+  exit 1
+fi
 
 step "3/7 team API keys"
 if [ -s .team_api_keys ]; then

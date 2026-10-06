@@ -27,6 +27,11 @@ volume works; one that already holds the model and installs makes the next pod s
 | 6 | Checks through `alphaexperiments.com`: 401 without a key, the model list and a short answer with a team key |
 | 7 | The pod's team keys are copied back to `.team_api_keys`; with `E2E_PASSWORD` set, the Playwright tests run against the live site |
 
+A pod that RunPod migrated from another one gets the old volume copied onto it after it starts (`df -h /workspace`
+grows for 30-60 min, and root cannot write there meanwhile). `new_pod.sh` stops at step 2 with that message; rerun
+it once the copy has finished. The copy brings the old pod's models, installs and tunnel key, so the rerun takes
+about 10 minutes and the edge needs no change.
+
 It can be rerun at any time: finished steps are skipped, and a rerun on the live pod restarts the gateway and tunnel
 for a few seconds. The first time, without a `.team_api_keys` on the Mac, the pod creates a key labelled `team` and
 it is saved there. The steps below do the same by hand, and set up the parts `new_pod.sh` relies on.
